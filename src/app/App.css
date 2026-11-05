@@ -1,0 +1,142 @@
+:root {
+  font-family: system-ui, sans-serif;
+  color: #292e2c;
+  background: #f3f2ee;
+  font-synthesis: none;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+main {
+  max-width: 1240px;
+  margin: auto;
+  padding: 64px 32px;
+}
+header {
+  margin-bottom: 32px;
+}
+.eyebrow {
+  color: #667b6c;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+}
+h1 {
+  font-size: clamp(32px, 5vw, 54px);
+  letter-spacing: -0.05em;
+  margin: 12px 0;
+}
+h2 {
+  margin: 0 0 12px;
+  font-size: 19px;
+}
+p,
+li,
+small {
+  color: #68716a;
+  line-height: 1.6;
+}
+.summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.summary span {
+  padding: 10px 16px;
+  border: 1px solid #d5dbd2;
+  border-radius: 30px;
+  font-size: 13px;
+  background: #e9ede5;
+}
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(280px, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+.card {
+  background: #fffefa;
+  border: 1px solid #e0e2d9;
+  border-radius: 16px;
+  padding: 28px;
+}
+.card > p {
+  font-size: 14px;
+  margin-top: 0;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+th,
+td {
+  padding: 14px 8px;
+  border-bottom: 1px solid #eceee6;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+th:first-child {
+  text-align: left;
+  padding-left: 0;
+}
+thead th {
+  color: #748074;
+  font-size: 11px;
+  text-transform: uppercase;
+}
+tbody th {
+  font-weight: 500;
+}
+.distance-field {
+  display: block;
+  margin-top: 24px;
+  font-size: 14px;
+}
+.input-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 0;
+}
+input {
+  width: 100%;
+  border: 1px solid #c9d0c4;
+  border-radius: 8px;
+  padding: 12px;
+  background: white;
+  font: inherit;
+}
+input:focus {
+  outline: 2px solid #6c896f;
+  outline-offset: 2px;
+}
+input[aria-invalid="true"] {
+  border-color: #b34f39;
+}
+small {
+  display: block;
+  font-size: 11px;
+}
+.notes {
+  margin-top: 24px;
+}
+.notes li {
+  margin: 8px 0;
+  font-size: 13px;
+}
+@media (max-width: 850px) {
+  main {
+    padding: 32px 16px;
+  }
+  .workspace {
+    grid-template-columns: 1fr;
+  }
+  .card {
+    padding: 20px;
+  }
+}
