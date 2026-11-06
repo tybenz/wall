@@ -1,0 +1,101 @@
+import { describe, expect, it } from "vitest";
+import { createDesignerController } from "../src/designer/DesignerController";
+import { createInitialProject } from "../src/designer/InitialProject";
+import { decodeProject } from "../src/project/ProjectSchema";
+import type { ProjectStorage } from "../src/project/ProjectPersistence";
+import { inches } from "../src/shared/Units";
+function memoryStorage(): ProjectStorage {
+  let saved: string | null = null;
+  return {
+    read: () => saved,
+    write: (text) => {
+      saved = text;
+    },
+  };
+}
+describe("project persistence", () => {
+  it("round-trips a complete edited project through save/reset/load and a fresh controller", () => {
+    const storage = memoryStorage();
+    const controller = createDesignerController(
+      createInitialProject(),
+      storage,
+    );
+    controller.setDistance("panelRearGap", inches(2));
+    controller.setProductDimension("tv", "width", 1500);
+    controller.setStuds([200, 600, 1000], true);
+    controller.setSoundbarOrientation("vertical");
+    controller.saveLocal();
+    const saved = controller.store.getSnapshot().project;
+    controller.reset();
+    expect(controller.store.getSnapshot().project).not.toEqual(saved);
+    controller.loadLocal();
+    expect(controller.store.getSnapshot().project).toEqual(saved);
+    const fresh = createDesignerController(createInitialProject(), storage);
+    fresh.loadLocal();
+    expect(fresh.store.getSnapshot().assembly).toEqual(
+      controller.store.getSnapshot().assembly,
+    );
+  });
+  it("rejects malformed, incompatible, incomplete and nonfinite files without replacing the current design", () => {
+    const controller = createDesignerController(createInitialProject());
+    const before = controller.store.getSnapshot();
+    const invalids = [
+      "not json",
+      "{}",
+      JSON.stringify({ ...before.project, schemaVersion: 1 }),
+      JSON.stringify({
+        ...before.project,
+        studs: { positions: [1, 1], confirmed: true },
+      }),
+      JSON.stringify({
+        ...before.project,
+        distances: {
+          ...before.project.distances,
+          wallWidth: { ...before.project.distances.wallWidth, mm: -1 },
+        },
+      }),
+      JSON.stringify({
+        ...before.project,
+        products: {
+          ...before.project.products,
+          tv: {
+            ...before.project.products.tv,
+            width: {
+              mm: null,
+              evidence: before.project.products.tv.width.evidence,
+            },
+          },
+        },
+      }),
+    ];
+    for (const text of invalids) {
+      expect(() => controller.importProject(text)).toThrow();
+      expect(controller.store.getSnapshot()).toBe(before);
+    }
+  });
+  it("preserves sources during export and makes user-edited facts explicit", () => {
+    const controller = createDesignerController(createInitialProject());
+    controller.setProductDimension("slats", "depth", 15);
+    const project = decodeProject(controller.exportProject());
+    expect(project.products.slats.depth.evidence.source).toBe("user-entered");
+    expect(project.products.tv.depth.evidence.source).toBe(
+      "local-reference:television",
+    );
+  });
+  it("reports unavailable storage without losing project edits", () => {
+    const controller = createDesignerController(createInitialProject(), {
+      read: () => {
+        throw new Error("Storage denied");
+      },
+      write: () => {
+        throw new Error("Storage full");
+      },
+    });
+    controller.setDistance("tvCenterHeight", 1400);
+    expect(() => controller.saveLocal()).toThrow("Storage full");
+    expect(() => controller.loadLocal()).toThrow("Storage denied");
+    expect(
+      controller.store.getSnapshot().project.distances.tvCenterHeight.mm,
+    ).toBe(1400);
+  });
+});

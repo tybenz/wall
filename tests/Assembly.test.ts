@@ -64,7 +64,14 @@ describe("assembly resolution", () => {
   });
 
   it("exposes a provisional soundbar/panel conflict instead of implying clearance", () => {
-    const project = createInitialProject();
+    const initial = createInitialProject();
+    const project = {
+      ...initial,
+      distances: {
+        ...initial.distances,
+        soundbarOffsetZ: { ...initial.distances.soundbarOffsetZ, mm: 0 },
+      },
+    };
     expect(
       resolveAssembly(project).findings.some(
         (finding) => finding.code === "soundbar-panel-overlap",

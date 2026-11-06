@@ -1,26 +1,39 @@
 # Wall
 
-A parametric TV wall designer: start with the desired finished arrangement and work back toward verifiable installation geometry.
+A parametric wall-design studio with fixed front, side and orthographic isometric views. Adjust the composition, peel back its layers, inspect dimensions and save a design locally.
 
-## Run
+## Run locally
 
-Node20.19+ or22.12+ is required by Vite. Dependencies are pinned in `package-lock.json`.
+Use Node 20.19+ or 22.12+.
 
 ```sh
 npm ci
 npm run dev
 ```
 
-`npm run check` runs model/controller tests, TypeScript checking, and a production build.
+Open the `/wall/` URL printed by Vite, normally http://localhost:5173/wall/. The 3D renderer needs WebGL; editing and project export remain available if rendering cannot start.
 
-## Current milestone
+## Try the design
 
-Milestone1 establishes product evidence, a shared spatial model, vanilla controller/store reactivity, and a small diagnostic UI. The depth schedule updates when a temporary input loses focus. Finished product rendering, preset view/layer controls, the editing drawer and persistence belong to later agreed milestones.
+- Select **Front**, **Side** or **Isometric**. Fit and zoom buttons keep the camera on preset axes; there are no orbit or drag controls.
+- Move through **Finished → Behind TV → Behind panel → At drywall → Inside wall**. The inspection level survives camera changes.
+- Hover or focus a dimension for emphasis. Its adjacent edit button opens the right drawer and selects its controlling input. Calculated dimensions explain their inputs.
+- Use the drawer to edit placement, surfaces, part sizes/finishes, stud offsets, schematic mounting geometry and electrical positions. Valid numbers update the drawing immediately. Inputs use the selected inch/mm display unit; the model stores millimeters.
+- **Save locally** stores the current design in this browser. The next visit restores the last save. **Load** restores it explicitly; **Export / Import** transfer versioned JSON files. Reset keeps the saved copy. Unsaved edits are not automatically persisted.
 
-Read [the architecture](docs/Architecture.md) for the interfaces and [the requirements](docs/Requirements.md) for the full v1 scope. Original handoffs and research are local-only artifacts in the gitignored `.tmp/` directory. Tracked catalog data uses generic labels and local-reference identifiers, with no vendor names, model identifiers, shopping links or prices.
+The current app implements the agreed v1 for hands-on user testing. Read [Architecture](docs/Architecture.md), [Requirements](docs/Requirements.md) and the [testing guide](docs/Testing.md).
 
-## Deployment
+## Limits
 
-Pushes to `main` run format checks, tests and a production build, then deploy only `dist/` to GitHub Pages through `.github/workflows/Pages.yml`. Repository Settings → Pages → Source must be **GitHub Actions**.
+Product silhouettes, textures and rib pitch are illustrative. Wall, mount, cradle, blocking, spacers, boxes and cable geometry remain provisional until measured. Layer inspection is not a structural or electrical installation approval. Checks cover selected envelope conflicts and stock dimensions, not articulation, fastener design, cable bend radius or code compliance. Camera/view settings are session-only; saved projects retain design data.
 
-The app is hosted at https://tybenz.github.io/wall/. Vite's asset base is `/wall/`. Run `npm run dev` and open its `/wall/` path for local development. Research in `.tmp/` is excluded from both Git and the build output.
+## Local references and deployment
+
+Original handoffs and research live only in ignored `.tmp/`. Tracked catalog data uses generic labels and opaque local-reference IDs. Vendor names, model IDs, shopping links and prices are excluded from source, Git and build output.
+
+Pushes to `main` run formatting, tests and build, then upload only `dist/` to GitHub Pages through `.github/workflows/Pages.yml`. Repository Pages source must be **GitHub Actions**. The configured URL is https://tybenz.github.io/wall/; publishing status is separate from local development.
+
+```sh
+npm run check
+npm run format:check
+```

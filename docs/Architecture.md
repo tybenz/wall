@@ -1,43 +1,44 @@
-# Architecture — milestone1
+# Architecture
 
 ## Data flow
 
 ```text
-React input → DesignerController.setDistance(id, millimeters)
-                       ↓
-                ResolveAssembly(project)
-                       ↓
-          DesignerStore publishes one immutable snapshot
-                       ↓
-           UseDesigner / useSyncExternalStore → React views
+React input → DesignerController → Project validation → ResolveAssembly
+                                 ↓
+                      immutable DesignerStore snapshot
+                                 ↓
+          React drawing + SVG annotations + distances drawer
 ```
 
-The store provides only `getSnapshot()` and `subscribe(listener)` to readers. Snapshots retain identity between changes and are deeply frozen. The controller owns publication, rejects nonfinite/out-of-range distances and computes the entire result before notifying. Each workspace gets its own controller at composition time; React context distributes it without a global store singleton.
+`App.tsx` only supplies a controller and mounts `DesignerWorkspace`. `Main.tsx` creates a workspace-owned controller and injects browser persistence. There is no router or global controller singleton.
 
-`setDistance` throws a RangeError on invalid numeric values and publishes nothing. Valid identical values are no-ops. Changes preserve source/uncertainty metadata and do not imply measurement confirmation. Numeric inputs keep temporary invalid text local to React; domain state receives only valid numbers.
+## Modules and interfaces
 
-## Modules
+- **designer** owns the Project, domain actions, immutable store and workspace composition. `setDistance`, `setProductDimension`, `setStuds`, `setFinish` and `setSoundbarOrientation` validate before resolving and publishing. Invalid changes publish nothing. `getSnapshot()` retains identity between changes; `subscribe()` returns an unsubscribe function. The React adapter is only `useSyncExternalStore`.
+- **products** contains generic, sourced millimeter dimensions and appearance parameters. Detailed vendor mappings and research are local-only in `.tmp/`.
+- **geometry** resolves the complete assembly and selected conflict findings without React or browser dependencies. `ResolveConstruction` generates stud/blocking/support/box envelopes and cable polylines from explicit project inputs. Bounds are minimum X/Y/Z plus positive extents.
+- **project** validates strict schema-version-2 JSON, encodes/decodes files, and defines the injected read/write persistence interface. Bad/oversized/incompatible imports do not replace the current project. Local storage failures remain recoverable through export. The earlier foundation schema was never a saved-project format and is intentionally not migrated.
+- **viewer** owns a separate vanilla controller/store for camera presets, inspection levels, zoom, layer toggles, dimensions, drawer selection and focus requests. `UseView` is the thin subscription adapter. Each edit request increments a focus request counter so repeated clicks can reselect the same field.
+- **viewer/drawings** contains parameterized product and construction renderers. React Three Fiber draws the shared millimeter assembly. Normalized rounded geometry, procedural textures and instanced ribs provide detail without external image requests or product branding. Scene rendering is lazy-loaded.
+- **viewer/annotations** projects world coordinates using the same orthographic camera as the canvas. Preset dimensions stay subtle; hover and focus increase emphasis. Focused drawer fields add their annotation where necessary. Stable FieldId values connect SVG edit buttons to inputs; derived dimensions point to controlling inputs and an explanation.
+- **editor** contains grouped drawer controls and input presentation. React handles temporary number strings, DOM focus/selection, scrolling and validation messages; business rules remain in the controller/schema. Drawer scrolling does not move the main document.
 
-- `products`: generic part dimensions in millimeters, evidence classifications and preliminary appearance profiles. No React. Source identifiers resolve to local-only research in `.tmp/`; vendor names, model identifiers, shopping URLs and prices never enter tracked data or the deployed bundle.
-- `designer`: project inputs, vanilla controller/store, thin React subscription adapter, workspace composition and temporary diagnostic UI.
-- `geometry`: pure resolution from Project to Assembly; no React, subscriptions or DOM.
-- `shared/Units.ts`: inch/mm conversion and display formatting.
-- `app`: root composition and styles. App only supplies the controller and mounts the workspace.
+## Spatial conventions and initial relationships
 
-Keep future feature logic beside its feature: viewer presets and inspection actions in the viewer module, drawer selection behavior in the designer/editor interaction module. Extract shared primitives when multiple concrete callers require them. No router is needed for one workspace.
+X starts at the left wall edge; Y starts at finished floor. Z=0 is the existing drywall front face, with positive Z into the room. All domain lengths are millimeters. UI conversion occurs at input/output seams.
 
-## Spatial conventions
+`WallProfile` resolves independent left/right ceiling heights, the beam position and its underside notch. Drywall and slat backing share that polygon; ribs and studs stop at its local cut height. Initial wall width is 103 inches, both edges are 108 inches, and the ceiling meets the beam at 115 inches with its underside at 112 inches. The nominal 1 × 8 wrapper uses an explicitly provisional 7.25-inch face width. Beam depth into the room is a short context preview. Saved rectangular projects receive the added profile fields; only the old untouched height placeholder is upgraded, preserving other edits.
 
-X starts at the wall's left edge. Y starts at finished floor. Z=0 is the front face of existing drywall; positive Z points into the room. Each part has an origin at its minimum X/Y/Z and positive width/height/depth.
+Panel rear = slat thickness + chosen panel rear gap. Panel front adds the white slab thickness. TV rear adds the chosen rear gap; its envelope then adds body depth. The source slat thickness is 0.47 inches (11.938 mm). The panel rear-gap interpretation is explicit in the UI.
 
-Initial assembly: framing zone → drywall →0.47-inch slats →1.5-inch rear-panel gap →19 mm MDF →1-inch provisional TV rear gap →2.2-inch TV envelope. Values are sourced or explicitly provisional. The panel-rear gap convention needs user confirmation: the handoff's projection language was ambiguous.
+TV, soundbar and panel track TV center height. Signed offsets allow their alignment to change. The console rests on the floor with independent horizontal/depth offsets. Soundbar orientation swaps bare housing height/depth; a provisional forward offset keeps the initial bar clear of the white slab. Cradle reach remains unmeasured.
 
-TV, panel, soundbar and console are horizontally centered for this milestone. Panel center tracks TV center. The soundbar tracks TV bottom with an editable project gap and is assumed flat with its front aligned to the TV front. Console rests on the floor. These relationships are initial implementation choices, not a final constraint system. Front alignment currently causes a soundbar/panel envelope conflict, which the resolver explicitly flags; validate the real cradle before installation planning. This targeted envelope check is not a complete collision or articulation solver.
+Panel/mount spacer footprints create slat cutouts rather than bearing on ribs. The white panel has an illustrative mount opening, only cut when entirely contained. Blocking occupies the gaps between entered studs. Boxes and distinct power/low-voltage paths are schematic; no fastener coordinates are generated.
 
-Parts are dimensional envelopes, not detailed manufacturing contours. Framing is a volume, not an invented stud layout. Mount geometry, spacers, cutouts, blocking and electrical placements remain unresolved. All resolved placements are marked provisional. No fastener coordinates are produced.
+## View behavior
 
-Product changes can be supplied through the initial Project without altering resolver code; a product-edit action will be added when the UI needs it. Save serialization/version migration are deferred to milestone5, not implied by schemaVersion1 alone.
+A fitted orthographic camera provides front, right-side and equal-axis isometric projections. There are no mouse camera or drag-placement controls. The same camera instance drives canvas and annotations. Inspection hides TV/soundbar, then panel, slats, then drywall; structure/electrical become visible inside the wall. View state does not alter project data or persist with project saves.
 
-## Review checkpoint
+## Verification
 
-Before milestone2, review: Project vs Assembly shape; panel gap convention; source representation; initial soundbar alignment; controller/store interface. Next milestone adds product-specific drawing modules consuming Assembly geometry and catalog appearance. Preset projections and inspection levels will reuse this same assembly, not duplicate placement calculations.
+Model, controller, persistence, projection and view-state tests exercise the public interfaces. Browser checks cover rendering, camera/layer selection, dimension-to-input focus and local save/load. Visual refinements are expected during user testing. Keep future changes localized to these modules rather than adding rules to the workspace root.

@@ -1,45 +1,121 @@
+import { useState } from "react";
 import { useDesignerController } from "./DesignerContext";
 import { useDesigner } from "./UseDesigner";
-import { DepthSchedule } from "./DepthSchedule";
-import { FoundationInputs } from "./FoundationInputs";
+import { createViewController } from "../viewer/ViewStore";
+import { useView } from "../viewer/UseView";
+import { WallViewer } from "../viewer/WallViewer";
+import { ViewControls } from "../viewer/ViewControls";
+import { DimensionsDrawer } from "../editor/DimensionsDrawer";
+import { ProjectToolbar } from "./ProjectToolbar";
+import { FindingsPanel } from "./FindingsPanel";
 import { formatInches } from "../shared/Units";
-
 export function DesignerWorkspace() {
   const controller = useDesignerController();
-  const { project, assembly } = useDesigner(controller.store);
+  const snapshot = useDesigner(controller.store);
+  const [view] = useState(createViewController);
+  const state = useView(view);
   return (
-    <main>
-      <header>
-        <span className="eyebrow">WALL / MILESTONE 01</span>
-        <h1>A measured foundation.</h1>
-        <p>One spatial model for the finished wall and everything behind it.</p>
+    <main className={`application ${state.drawerOpen ? "has-drawer" : ""}`}>
+      <header className="topbar">
+        <a className="wordmark" href={import.meta.env.BASE_URL}>
+          wall<span> / </span>
+          <small>parametric studio</small>
+        </a>
+        <ProjectToolbar controller={controller} view={view} />
       </header>
-      <div className="summary">
-        <span>{formatInches(project.distances.wallWidth.mm)} wall</span>
-        <span>
-          {formatInches(project.products.slats.depth.mm)} slat thickness
-        </span>
-        <span>{assembly.coverage.cartons} cartons · nominal coverage</span>
-      </div>
-      <div className="workspace">
-        <DepthSchedule assembly={assembly} />
-        <FoundationInputs
-          distances={project.distances}
-          onChange={controller.setDistance}
+      <div className="workspace-content">
+        <div className="workspace-heading">
+          <div>
+            <span className="eyebrow">YOUR SPACE, IN PROPORTION</span>
+            <h1>TV feature wall</h1>
+          </div>
+          <div className="project-meta">
+            <span>
+              {formatInches(snapshot.project.distances.wallWidth.mm)} ×{" "}
+              {formatInches(snapshot.project.distances.wallHeight.mm)}
+            </span>
+            <span>
+              {snapshot.assembly.coverage.cartons} cartons · nominal coverage
+            </span>
+          </div>
+        </div>
+        <ViewControls view={view} state={state} />
+        <WallViewer
+          project={snapshot.project}
+          assembly={snapshot.assembly}
+          view={view}
+          state={state}
         />
+        <div className="view-options">
+          <label>
+            <input
+              type="checkbox"
+              checked={state.showConsole}
+              onChange={() => view.toggle("showConsole")}
+            />
+            Console
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              checked={state.showSupports}
+              onChange={() => view.toggle("showSupports")}
+            />
+            Supports
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              checked={state.showElectrical}
+              onChange={() => view.toggle("showElectrical")}
+            />
+            Electrical
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              checked={state.screenOn}
+              onChange={() => view.toggle("screenOn")}
+            />
+            Screen artwork
+          </label>
+          <label className="units-label">
+            Units
+            <select
+              aria-label="Display units"
+              value={state.units}
+              onChange={(event) =>
+                view.setUnits(event.target.value === "mm" ? "mm" : "in")
+              }
+            >
+              <option value="in">inches</option>
+              <option value="mm">millimeters</option>
+            </select>
+          </label>
+        </div>
+        <FindingsPanel assembly={snapshot.assembly} />
+        <footer>
+          Explore with fixed views. Hover a dimension to inspect it; choose its
+          edit button to jump to the distance.
+        </footer>
       </div>
-      <section className="card notes">
-        <h2>Still provisional</h2>
-        <p>
-          All placements are exploratory. Product dimensions retain their
-          sources; wall measurements and assembly assumptions need confirmation.
-        </p>
-        <ul>
-          {assembly.findings.map((finding) => (
-            <li key={finding.code}>{finding.message}</li>
-          ))}
-        </ul>
-      </section>
+      <DimensionsDrawer
+        controller={controller}
+        snapshot={snapshot}
+        view={view}
+        state={state}
+      />
+      {state.notice && (
+        <div className="toast" role="status">
+          <span>{state.notice}</span>
+          <button
+            aria-label="Dismiss notification"
+            onClick={() => view.notify(null)}
+          >
+            ×
+          </button>
+        </div>
+      )}
     </main>
   );
 }
