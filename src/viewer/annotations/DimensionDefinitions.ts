@@ -176,7 +176,7 @@ export function getDimensions(
       offset: [75, 0],
     });
   }
-  if (state.level >= 2) {
+  if (state.level >= 2 && state.level < 4) {
     const spacing = getFocusedDimension(
       "distance:supportSpacing",
       project,
@@ -206,5 +206,10 @@ export function getDimensions(
     const focused = getFocusedDimension(active, project, assembly);
     if (focused) result.push(focused);
   }
-  return result;
+  return state.level === 4
+    ? result.filter(
+        (dimension) =>
+          dimension.id !== "beam-drop" && dimension.id !== "panel-width",
+      )
+    : result;
 }

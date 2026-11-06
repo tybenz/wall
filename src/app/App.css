@@ -196,52 +196,6 @@ h3 {
   border-color: #93a68c;
   background: #e9efe3;
 }
-.inspection {
-  background: #fffefa;
-  border: 1px solid #e0e4d9;
-  border-radius: 12px 12px 0 0;
-  border-bottom: 0;
-  padding: 16px 20px 10px;
-}
-.inspection-heading {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-  color: #8d9988;
-  font-size: 10px;
-}
-.layer-buttons {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-.layer-buttons button {
-  font-size: 11px;
-  border: 0;
-  background: transparent;
-  padding: 7px 10px;
-  color: #7c8b77;
-  flex: 1;
-  white-space: nowrap;
-}
-.layer-buttons button:first-child,
-.layer-buttons button:last-child {
-  flex: 0;
-  padding: 7px 9px;
-}
-.layer-buttons button[aria-pressed="true"] {
-  color: #3d5639;
-  background: #e9efdf;
-  font-weight: 600;
-}
-.inspection p {
-  color: #8a9483;
-  font-size: 10px;
-  margin: 7px 0 0;
-  text-align: center;
-  min-height: 14px;
-}
 .viewport {
   position: relative;
   height: clamp(450px, 66vh, 900px);
@@ -249,8 +203,7 @@ h3 {
   overflow: hidden;
   background: #f0eee8;
   border: 1px solid #e0e4d9;
-  border-top: 0;
-  border-radius: 0 0 12px 12px;
+  border-radius: 12px;
 }
 .viewport-caption {
   position: absolute;
@@ -721,13 +674,6 @@ input[type="checkbox"] {
   .viewer-controls .primary {
     margin-left: auto;
   }
-  .layer-buttons {
-    flex-wrap: wrap;
-  }
-  .layer-buttons button {
-    padding: 6px 5px;
-    font-size: 10px;
-  }
   .view-options {
     gap: 12px;
     flex-wrap: wrap;
@@ -784,16 +730,6 @@ input[type="checkbox"] {
   .segmented button {
     padding: 7px 10px;
     font-size: 11px;
-  }
-  .inspection {
-    padding: 12px 10px;
-  }
-  .layer-buttons {
-    gap: 2px;
-  }
-  .layer-buttons button {
-    font-size: 9px;
-    padding: 8px 2px;
   }
   .viewport {
     height: 60vh;

@@ -82,7 +82,7 @@ describe("construction geometry", () => {
   it("centers plates on the mount and keeps a two-inch edge gap as the layout changes", () => {
     const controller = createDesignerController(createInitialProject());
     for (const [id, value] of [
-      ["tvOffsetX", inches(5)],
+      ["wallWidth", inches(110)],
       ["tvCenterHeight", inches(57)],
       ["mountHeight", inches(11)],
       ["mountOffsetY", inches(-3)],
@@ -113,11 +113,12 @@ describe("construction geometry", () => {
   });
   it("permits signed design offsets while rejecting invalid physical lengths", () => {
     const controller = createDesignerController(createInitialProject());
-    controller.setDistance("tvOffsetX", -100);
+    controller.setDistance("mountOffsetY", -100);
     const assembly = controller.store.getSnapshot().assembly;
-    expect(getPart(assembly, "tv").bounds.x).toBeCloseTo(
-      (inches(103) - inches(56.9)) / 2 - 100,
-    );
+    expect(
+      getPart(assembly, "mount").bounds.y +
+        getPart(assembly, "mount").bounds.height / 2,
+    ).toBeCloseTo(inches(52) - 100);
     expect(() => controller.setProductDimension("tv", "depth", 0)).toThrow();
     expect(() => controller.setStuds([NaN], false)).toThrow();
   });

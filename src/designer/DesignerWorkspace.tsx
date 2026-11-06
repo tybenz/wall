@@ -50,15 +50,8 @@ export function DesignerWorkspace() {
           <label>
             <input
               type="checkbox"
-              checked={state.showConsole}
-              onChange={() => view.toggle("showConsole")}
-            />
-            Console
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              checked={state.showSupports}
+              checked={state.level < 4 && state.showSupports}
+              disabled={state.level === 4}
               onChange={() => view.toggle("showSupports")}
             />
             Supports

@@ -1,0 +1,48 @@
+/* Paint the range explicitly so browser pressed/hover colors stay constant. */
+input.range-control {
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  box-shadow: none;
+  transition: none;
+  -webkit-tap-highlight-color: transparent;
+}
+input.range-control::-webkit-slider-runnable-track {
+  height: 4px;
+  border: 0;
+  border-radius: 2px;
+  background: #c9d2c2;
+  box-shadow: none;
+}
+input.range-control::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  margin-top: -5px;
+  border: 0;
+  border-radius: 50%;
+  background: #59795d;
+  box-shadow: none;
+  transition: none;
+}
+input.range-control::-moz-range-track,
+input.range-control::-moz-range-progress {
+  height: 4px;
+  border: 0;
+  border-radius: 2px;
+  background: #c9d2c2;
+  box-shadow: none;
+}
+input.range-control::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border: 0;
+  border-radius: 50%;
+  background: #59795d;
+  box-shadow: none;
+  transition: none;
+}

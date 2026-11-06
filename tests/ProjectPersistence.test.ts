@@ -136,4 +136,30 @@ describe("project persistence", () => {
         .soundbarGap.mm,
     ).toBeCloseTo(inches(0.5));
   });
+  it("retires saved centering offsets and keeps the three major elements centered", () => {
+    const initial = createInitialProject();
+    const distances: Record<string, unknown> = { ...initial.distances };
+    for (const id of [
+      "tvOffsetX",
+      "consoleOffsetX",
+      "panelOffsetX",
+      "panelOffsetY",
+    ])
+      distances[id] = { ...initial.distances.mountOffsetY, mm: inches(5) };
+    const project = decodeProject(JSON.stringify({ ...initial, distances }));
+    const controller = createDesignerController(project);
+    controller.setDistance("wallWidth", inches(120));
+    controller.setDistance("panelWidth", inches(80));
+    controller.setDistance("tvCenterHeight", inches(55));
+    const { assembly } = controller.store.getSnapshot();
+    for (const id of ["tv", "featurePanel", "console"]) {
+      const b = assembly.parts.find((part) => part.id === id)!.bounds;
+      expect(b.x + b.width / 2).toBeCloseTo(inches(60));
+    }
+    const panel = assembly.parts.find(
+      (part) => part.id === "featurePanel",
+    )!.bounds;
+    expect(panel.y + panel.height / 2).toBeCloseTo(inches(55));
+    expect(project.distances).not.toHaveProperty("tvOffsetX");
+  });
 });

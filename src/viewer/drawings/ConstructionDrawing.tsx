@@ -20,7 +20,7 @@ export function ConstructionDrawing({
         c.blocking.map((bounds, index) => (
           <SolidPart key={`block-${index}`} bounds={bounds} color="#b8976b" />
         ))}
-      {state.showSupports && (
+      {state.showSupports && state.level < 4 && (
         <>
           {c.supports.map((bounds, index) => (
             <SolidPart

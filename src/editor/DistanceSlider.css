@@ -1,0 +1,25 @@
+.distance-slider {
+  margin: 12px 0 9px;
+}
+.distance-slider input[type="range"] {
+  display: block;
+  width: 100%;
+  height: 20px;
+  margin: 0;
+  accent-color: #59795d;
+  cursor: ew-resize;
+}
+.slider-scale {
+  display: flex;
+  justify-content: space-between;
+  color: #8b9980;
+  font-size: 9px;
+  font-variant-numeric: tabular-nums;
+}
+.distance-field .slider-hint {
+  margin-top: 5px;
+  color: #85927a;
+}
+.distance-field .slider-hint.is-fine {
+  color: #3f6944;
+}

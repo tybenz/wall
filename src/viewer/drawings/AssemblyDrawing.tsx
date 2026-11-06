@@ -24,7 +24,9 @@ export function AssemblyDrawing({
   const panel = getPart(assembly, "featurePanel");
   return (
     <group>
-      <SolidPart bounds={getPart(assembly, "beam").bounds} color="#796044" />
+      {state.level < 4 && (
+        <SolidPart bounds={getPart(assembly, "beam").bounds} color="#796044" />
+      )}
       {state.level < 4 && (
         <PanelSlab
           bounds={getPart(assembly, "drywall").bounds}
@@ -69,7 +71,7 @@ export function AssemblyDrawing({
           />
         </>
       )}
-      {state.showConsole && (
+      {state.level === 0 && (
         <MediaConsole
           bounds={getPart(assembly, "console").bounds}
           color={p.console.appearance.color}

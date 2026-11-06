@@ -135,23 +135,11 @@ export function getFocusedDimension(
       start = [tvCenter[0], 0, tvCenter[2]];
       end = tvCenter;
       break;
-    case "tvOffsetX":
-      start = [w / 2, tv.y + tv.height, tvCenter[2]];
-      end = [tvCenter[0], tv.y + tv.height, tvCenter[2]];
-      break;
     case "panelWidth":
       [start, end] = axisDimension(panel, "width", panel.width);
       break;
     case "panelHeight":
       [start, end] = axisDimension(panel, "height", panel.height);
-      break;
-    case "panelOffsetX":
-      start = [tvCenter[0], panelCenter[1], panelCenter[2]];
-      end = panelCenter;
-      break;
-    case "panelOffsetY":
-      start = [panelCenter[0], tvCenter[1], panelCenter[2]];
-      end = panelCenter;
       break;
     case "panelRearGap":
       start = [panel.x, panelCenter[1], assembly.depth.slatFront];
@@ -176,10 +164,6 @@ export function getFocusedDimension(
     case "consoleWallGap":
       start = [console.x, consoleCenter[1], assembly.depth.slatFront];
       end = [console.x, consoleCenter[1], console.z];
-      break;
-    case "consoleOffsetX":
-      start = [w / 2, console.y + console.height, consoleCenter[2]];
-      end = [consoleCenter[0], console.y + console.height, consoleCenter[2]];
       break;
     case "slatPitch":
       start = [0, h * 0.9, assembly.depth.slatFront];

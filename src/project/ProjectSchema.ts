@@ -78,6 +78,10 @@ export const projectSchema = z
           typeof legacyHeight.note === "string" &&
           legacyHeight.note.startsWith("Simplified rectangular wall");
         const {
+          tvOffsetX: _tvOffsetX,
+          consoleOffsetX: _consoleOffsetX,
+          panelOffsetX: _panelOffsetX,
+          panelOffsetY: _panelOffsetY,
           openingWidth: _openingWidth,
           openingHeight: _openingHeight,
           mountSpacerDepth: _mountSpacerDepth,

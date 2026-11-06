@@ -1,24 +1,5 @@
 import type { ViewController, ViewSnapshot, CameraPreset } from "./ViewStore";
-export const inspectionLevels = [
-  { label: "Finished", description: "Complete wall composition" },
-  {
-    label: "Behind TV",
-    description: "TV and soundbar removed · inspect mount and panel",
-  },
-  {
-    label: "Behind panel",
-    description:
-      "Panel and bracket removed · perimeter spacers, mount spacers and lag paths",
-  },
-  {
-    label: "At drywall",
-    description: "Slats removed · spacers against existing drywall",
-  },
-  {
-    label: "Inside wall",
-    description: "Drywall removed · schematic studs, blocking and electrical",
-  },
-] as const;
+import { InspectionSlider } from "./InspectionSlider";
 export function ViewControls({
   view,
   state,
@@ -42,6 +23,7 @@ export function ViewControls({
             </button>
           ))}
         </div>
+        <InspectionSlider level={state.level} onChange={view.setLevel} />
         <div className="zoom-controls">
           <button
             aria-label="Zoom out"
@@ -66,38 +48,6 @@ export function ViewControls({
         <button className="primary" onClick={() => view.openEditor()}>
           Edit distances ↗
         </button>
-      </div>
-      <div className="inspection">
-        <div className="inspection-heading">
-          <span className="eyebrow">INSPECT THE ASSEMBLY</span>
-          <span>{state.level + 1} / 5</span>
-        </div>
-        <div className="layer-buttons">
-          <button
-            aria-label="Previous inspection layer"
-            disabled={state.level === 0}
-            onClick={() => view.setLevel(state.level - 1)}
-          >
-            ←
-          </button>
-          {inspectionLevels.map((level, index) => (
-            <button
-              key={level.label}
-              aria-pressed={state.level === index}
-              onClick={() => view.setLevel(index)}
-            >
-              {level.label}
-            </button>
-          ))}
-          <button
-            aria-label="Next inspection layer"
-            disabled={state.level === 4}
-            onClick={() => view.setLevel(state.level + 1)}
-          >
-            →
-          </button>
-        </div>
-        <p>{inspectionLevels[state.level].description}</p>
       </div>
     </>
   );

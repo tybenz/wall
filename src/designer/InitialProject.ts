@@ -23,16 +23,6 @@ export function createInitialProject(): Project {
     studs: { positions: [8, 24, 40, 56, 72, 88].map(inches), confirmed: false },
     soundbarOrientation: "flat",
     distances: {
-      tvOffsetX: preference(0, "Centered on wall; positive moves right."),
-      panelOffsetX: preference(
-        0,
-        "Relative to TV center; positive moves right.",
-      ),
-      panelOffsetY: preference(0, "Relative to TV center; positive moves up."),
-      consoleOffsetX: preference(
-        0,
-        "Relative to wall center; positive moves right.",
-      ),
       soundbarOffsetZ: preference(
         3,
         "Provisional forward offset avoids panel interference; verify cradle reach.",

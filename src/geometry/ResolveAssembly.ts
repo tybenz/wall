@@ -12,7 +12,7 @@ export function resolveAssembly(project: Project): Assembly {
   const { distances: d, products: p } = project;
   const w = d.wallWidth.mm,
     h = Math.max(d.wallHeight.mm, d.wallLeftHeight.mm, d.wallRightHeight.mm),
-    cx = w / 2 + d.tvOffsetX.mm,
+    cx = w / 2,
     cy = d.tvCenterHeight.mm;
   const wallProfile = resolveWallProfile(project);
   const slatFront = p.slats.depth.mm,
@@ -27,8 +27,8 @@ export function resolveAssembly(project: Project): Assembly {
     bounds: Bounds,
   ): AssemblyPart => ({ id, label, bounds, provisional: true });
   const panel = {
-    x: cx + d.panelOffsetX.mm - d.panelWidth.mm / 2,
-    y: cy + d.panelOffsetY.mm - d.panelHeight.mm / 2,
+    x: cx - d.panelWidth.mm / 2,
+    y: cy - d.panelHeight.mm / 2,
     z: panelRear,
     width: d.panelWidth.mm,
     height: d.panelHeight.mm,
@@ -107,7 +107,7 @@ export function resolveAssembly(project: Project): Assembly {
       depth: barDepth,
     }),
     part("console", "Freestanding console", {
-      x: w / 2 + d.consoleOffsetX.mm - p.console.width.mm / 2,
+      x: w / 2 - p.console.width.mm / 2,
       y: 0,
       z: slatFront + d.consoleWallGap.mm,
       width: p.console.width.mm,

@@ -43,7 +43,10 @@ describe("vaulted wall and beam", () => {
         ...project.distances,
         panelWidth: { ...project.distances.panelWidth, mm: inches(100) },
         panelHeight: { ...project.distances.panelHeight, mm: inches(10) },
-        panelOffsetY: { ...project.distances.panelOffsetY, mm: inches(54) },
+        tvCenterHeight: {
+          ...project.distances.tvCenterHeight,
+          mm: inches(106),
+        },
       },
     });
     expect(

@@ -55,12 +55,6 @@ export const distanceDefinitions = {
     min: 0,
     max: 10000,
   },
-  tvOffsetX: {
-    label: "TV offset from wall center",
-    group: "placement",
-    min: -5000,
-    max: 5000,
-  },
   panelWidth: {
     label: "White panel width",
     group: "surfaces",
@@ -71,18 +65,6 @@ export const distanceDefinitions = {
     label: "White panel height",
     group: "surfaces",
     min: 100,
-    max: 5000,
-  },
-  panelOffsetX: {
-    label: "Panel offset from TV center",
-    group: "placement",
-    min: -5000,
-    max: 5000,
-  },
-  panelOffsetY: {
-    label: "Panel vertical offset from TV center",
-    group: "placement",
-    min: -5000,
     max: 5000,
   },
   panelRearGap: {
@@ -120,12 +102,6 @@ export const distanceDefinitions = {
     group: "placement",
     min: 0,
     max: 1000,
-  },
-  consoleOffsetX: {
-    label: "Console offset from wall center",
-    group: "placement",
-    min: -5000,
-    max: 5000,
   },
   slatPitch: {
     label: "Wall rib spacing (visual estimate)",

@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import type { FieldId } from "../designer/DesignerTypes";
 import type { ViewController } from "../viewer/ViewStore";
 import { inches, toInches } from "../shared/Units";
+import { DistanceSlider } from "./DistanceSlider";
+import { getSliderRange } from "./SliderRanges";
 export function DistanceInput({
   field,
   label,
@@ -13,7 +15,7 @@ export function DistanceInput({
   confirmed,
   onConfirm,
 }: {
-  field: FieldId;
+  field: Exclude<FieldId, "studs">;
   label: string;
   mm: number;
   note: string;
@@ -73,6 +75,25 @@ export function DistanceInput({
         />
         <span>{units === "in" ? "in" : "mm"}</span>
       </div>
+      <DistanceSlider
+        label={label}
+        mm={mm}
+        range={getSliderRange(field, mm)}
+        units={units}
+        onFocus={() => view.focus(field)}
+        onBlur={() => view.focus(null)}
+        onChange={(value) => {
+          try {
+            onChange(value);
+            setDraft(format(value));
+            setError("");
+          } catch (cause) {
+            setError(
+              cause instanceof Error ? cause.message : "Invalid distance.",
+            );
+          }
+        }}
+      />
       <small id={`${id}-note`} className={error ? "field-error" : ""}>
         {error || note}
       </small>

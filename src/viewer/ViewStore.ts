@@ -14,7 +14,6 @@ export type ViewSnapshot = Readonly<{
   hoveredField: FieldId | null;
   activeField: FieldId | null;
   explanation: string | null;
-  showConsole: boolean;
   showElectrical: boolean;
   showSupports: boolean;
   screenOn: boolean;
@@ -34,7 +33,6 @@ export function createViewController() {
     hoveredField: null,
     activeField: null,
     explanation: null,
-    showConsole: true,
     showElectrical: true,
     showSupports: true,
     screenOn: true,
@@ -63,12 +61,7 @@ export function createViewController() {
       update({ zoom: Math.max(0.6, Math.min(2, zoom)) }),
     setUnits: (units: ViewSnapshot["units"]) => update({ units }),
     toggle: (
-      key:
-        | "dimensions"
-        | "showConsole"
-        | "showElectrical"
-        | "showSupports"
-        | "screenOn",
+      key: "dimensions" | "showElectrical" | "showSupports" | "screenOn",
     ) => update({ [key]: !snapshot[key] }),
     openEditor: (
       group: EditorGroup = "placement",
