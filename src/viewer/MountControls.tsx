@@ -30,9 +30,7 @@ export function MountControls({
         </div>
         <button
           className="mount-settings"
-          onClick={() =>
-            view.openEditor("structure", "distance:mountExtension")
-          }
+          onClick={() => view.openEditor("tv", "distance:mountExtension")}
         >
           Edit mount range ↗
         </button>

@@ -54,18 +54,18 @@ export function exportConstructionSvg(
         ]
       : []),
     ...(Object.keys(distanceDefinitions) as DistanceId[])
-      .filter((id) => project.distances[id].confidence !== "confirmed")
+      .filter(
+        (id) =>
+          distanceDefinitions[id].kind === "measurement" &&
+          project.distances[id].confidence !== "confirmed",
+      )
       .map(
         (id) =>
           `${distanceDefinitions[id].label}: ${fmt(project.distances[id].mm)} — ${project.distances[id].note}`,
       ),
     ...Object.values(project.products).flatMap((p) =>
       (["width", "height", "depth"] as const)
-        .filter(
-          (axis) =>
-            p[axis].evidence.kind === "assumption" ||
-            p[axis].evidence.source === "user-entered",
-        )
+        .filter((axis) => p[axis].confidence !== "confirmed")
         .map(
           (axis) =>
             `${p.name} ${axis}: ${fmt(p[axis].mm)} — ${p[axis].evidence.note}`,
@@ -75,6 +75,13 @@ export function exportConstructionSvg(
   const notes = [
     "Unresolved measurements and model assumptions",
     ...unresolved,
+    "Layout choices (not measurements awaiting verification)",
+    ...(Object.keys(distanceDefinitions) as DistanceId[])
+      .filter((id) => distanceDefinitions[id].kind === "preference")
+      .map(
+        (id) =>
+          `${distanceDefinitions[id].label}: ${fmt(project.distances[id].mm)}`,
+      ),
     "Current model findings",
     ...assembly.findings.map((f) => f.message),
   ].flatMap((line) => wrap(line));

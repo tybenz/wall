@@ -1,7 +1,7 @@
+import { fieldGroup } from "../designer/FieldCatalog";
 import { exportConstructionSvg } from "./ConstructionExport";
 import { useMemo } from "react";
-import type { Project, FieldId, DistanceId } from "../designer/DesignerTypes";
-import { distanceDefinitions } from "../designer/DistanceDefinitions";
+import type { Project, FieldId } from "../designer/DesignerTypes";
 import type { Assembly } from "../geometry/AssemblyTypes";
 import type { ViewController, ViewSnapshot } from "../viewer/ViewStore";
 import { formatInches } from "../shared/Units";
@@ -26,15 +26,7 @@ export function ConstructionDetails({
     () => resolveConstructionSection(project, assembly, state.constructionView),
     [project, assembly, state.constructionView],
   );
-  const edit = (field: FieldId) =>
-    view.openEditor(
-      field === "studs"
-        ? "structure"
-        : field.startsWith("product:")
-          ? "products"
-          : distanceDefinitions[field.slice(9) as DistanceId].group,
-      field,
-    );
+  const edit = (field: FieldId) => view.openEditor(fieldGroup(field), field);
   const exportSheet = () => {
     const url = URL.createObjectURL(
       new Blob([exportConstructionSvg(project, state.units)], {

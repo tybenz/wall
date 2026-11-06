@@ -81,3 +81,30 @@ it("compares physical part changes, measured status and layout settings", async 
   ).toBe("99 mm");
   expect(compareLayouts(p, p, "in")).toEqual([]);
 });
+
+it("applies saved layout choices against the current physical facts", async () => {
+  const { createDesignerController } =
+    await import("../src/designer/DesignerController");
+  const c = createDesignerController(createInitialProject()),
+    saved = c.store.getSnapshot().project;
+  c.setDistance("wallWidth", 2700);
+  c.confirmDistance("wallWidth", true);
+  c.setDistance("cradleThickness", 8);
+  c.confirmDistance("cradleThickness", true);
+  c.setProductDimension("tv", "width", 1500);
+  c.confirmProductDimension("tv", "width", true);
+  c.setStuds([100, 500, 900], true);
+  c.setDistance("tvCenterHeight", 1600);
+  const facts = c.store.getSnapshot().project;
+  c.applyAlternative(saved);
+  const applied = c.store.getSnapshot().project;
+  expect(applied.distances.tvCenterHeight).toEqual(
+    saved.distances.tvCenterHeight,
+  );
+  expect(applied.distances.wallWidth).toEqual(facts.distances.wallWidth);
+  expect(applied.distances.cradleThickness).toEqual(
+    facts.distances.cradleThickness,
+  );
+  expect(applied.products.tv.width).toEqual(facts.products.tv.width);
+  expect(applied.studs).toEqual(facts.studs);
+});

@@ -1,3 +1,4 @@
+import { applyLayoutAlternative } from "../alternatives/ApplyLayoutAlternative";
 import { resolveAssembly } from "../geometry/ResolveAssembly";
 import { createDesignerStore } from "./DesignerStore";
 import { createInitialProject } from "./InitialProject";
@@ -44,11 +45,19 @@ export function createDesignerController(
         ...current,
         distances: {
           ...current.distances,
-          [id]: { ...current.distances[id], mm },
+          [id]: {
+            ...current.distances[id],
+            mm,
+            ...(distanceDefinitions[id].kind === "measurement"
+              ? { confidence: "provisional" }
+              : {}),
+          },
         },
       });
     },
     confirmDistance(id: DistanceId, confirmed: boolean) {
+      if (distanceDefinitions[id].kind !== "measurement")
+        throw new Error("Only physical facts can be verified.");
       const current = store.getSnapshot().project;
       update({
         ...current,
@@ -68,6 +77,7 @@ export function createDesignerController(
         );
       const current = store.getSnapshot().project;
       const product = current.products[id];
+      if (product[axis].mm === mm) return;
       update({
         ...current,
         products: {
@@ -76,11 +86,36 @@ export function createDesignerController(
             ...product,
             [axis]: {
               mm,
+              confidence: "provisional",
               evidence: {
                 kind: "user-listing",
                 source: "user-entered",
-                note: "User edited dimension; verify against the actual part.",
+                note:
+                  product[axis].evidence.source === "user-entered"
+                    ? product[axis].evidence.note
+                    : `User edited dimension; verify against the actual part. Previous reference: ${product[axis].evidence.source}. ${product[axis].evidence.note}`,
               },
+            },
+          },
+        },
+      });
+    },
+    confirmProductDimension(
+      id: ProductId,
+      axis: ProductAxis,
+      confirmed: boolean,
+    ) {
+      const current = store.getSnapshot().project,
+        product = current.products[id];
+      update({
+        ...current,
+        products: {
+          ...current.products,
+          [id]: {
+            ...product,
+            [axis]: {
+              ...product[axis],
+              confidence: confirmed ? "confirmed" : "provisional",
             },
           },
         },
@@ -109,6 +144,14 @@ export function createDesignerController(
       soundbarOrientation: Project["soundbarOrientation"],
     ) {
       update({ ...store.getSnapshot().project, soundbarOrientation });
+    },
+    applyAlternative(saved: Project) {
+      update(
+        applyLayoutAlternative(
+          store.getSnapshot().project,
+          parseProject(saved),
+        ),
+      );
     },
     reset() {
       update(createInitialProject());

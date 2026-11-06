@@ -1,3 +1,4 @@
+import { fieldGroup } from "../designer/FieldCatalog";
 import type { ConstructionView } from "../construction/ConstructionSections";
 import type { MountPreset } from "../geometry/MountMotion";
 import type { FieldId } from "../designer/DesignerTypes";
@@ -35,7 +36,7 @@ export function createViewController() {
     dimensions: true,
     units: "in",
     drawerOpen: false,
-    group: "placement",
+    group: "tv",
     focusField: null,
     focusRequest: 0,
     hoveredField: null,
@@ -77,13 +78,13 @@ export function createViewController() {
       key: "dimensions" | "showElectrical" | "showSupports" | "screenOn",
     ) => update({ [key]: !snapshot[key] }),
     openEditor: (
-      group: EditorGroup = "placement",
+      group: EditorGroup = "tv",
       focusField: FieldId | null = null,
       explanation: string | null = null,
     ) =>
       update({
         drawerOpen: true,
-        group,
+        group: focusField ? fieldGroup(focusField) : group,
         focusField,
         explanation,
         focusRequest: snapshot.focusRequest + 1,

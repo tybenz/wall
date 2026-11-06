@@ -1,3 +1,4 @@
+import { distanceDefinitions, type DistanceId } from "./DistanceDefinitions";
 import { productCatalog } from "../products/ProductCatalog";
 import { inches } from "../shared/Units";
 import type { DistanceInput, Project } from "./DesignerTypes";
@@ -16,7 +17,7 @@ const measurement = (value: number, note: string): DistanceInput => ({
 });
 
 export function createInitialProject(): Project {
-  return {
+  const project: Project = {
     schemaVersion: 2,
     name: "TV feature wall",
     products: structuredClone(productCatalog),
@@ -201,5 +202,14 @@ export function createInitialProject(): Project {
         "Slat front face to console rear; provisional cable space.",
       ),
     },
+  };
+  return {
+    ...project,
+    distances: Object.fromEntries(
+      Object.entries(project.distances).map(([id, value]) => [
+        id,
+        { ...value, kind: distanceDefinitions[id as DistanceId].kind },
+      ]),
+    ) as Project["distances"],
   };
 }

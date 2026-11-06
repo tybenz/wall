@@ -75,7 +75,7 @@ export function getFocusedDimension(
       start,
       end,
       field,
-      group: "products",
+
       offset: [0, -34],
     };
   }
@@ -309,7 +309,7 @@ export function getFocusedDimension(
     start,
     end,
     field,
-    group: distanceDefinitions[id].group,
+
     offset: [-45, -32],
   };
 }

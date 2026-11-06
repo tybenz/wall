@@ -1,3 +1,4 @@
+import { applyLayoutAlternative } from "./ApplyLayoutAlternative";
 import { useState, useSyncExternalStore } from "react";
 import type { DesignerController } from "../designer/DesignerController";
 import type { Project } from "../designer/DesignerTypes";
@@ -30,7 +31,11 @@ export function LayoutAlternatives({
   const [selected, setSelected] = useState("");
   const alternative = saved.find((s) => s.name === selected);
   const changes = alternative
-    ? compareLayouts(project, alternative.project, state.units)
+    ? compareLayouts(
+        project,
+        applyLayoutAlternative(project, alternative.project),
+        state.units,
+      )
     : [];
   const act = (action: () => void, message: string) => {
     try {
@@ -53,7 +58,8 @@ export function LayoutAlternatives({
         <p>
           Save a named snapshot before trying a different construction layout.
           Project export contains the current layout; these alternatives stay in
-          this browser.
+          this browser. Applying a layout keeps your current physical facts,
+          part dimensions and verification status.
         </p>
         {library.getLoadError() && (
           <p role="alert">
@@ -102,10 +108,7 @@ export function LayoutAlternatives({
                 onClick={() =>
                   alternative &&
                   act(
-                    () =>
-                      controller.importProject(
-                        JSON.stringify(alternative.project),
-                      ),
+                    () => controller.applyAlternative(alternative.project),
                     `Applied ${alternative.name}.`,
                   )
                 }
@@ -150,8 +153,8 @@ export function LayoutAlternatives({
                   <p>All compared layout settings match.</p>
                 )}
                 <p>
-                  Snapshots also retain measurement notes and source
-                  information.
+                  Comparison shows the layout choices that will be applied.
+                  Current physical facts stay unchanged.
                 </p>
               </>
             )}

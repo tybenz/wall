@@ -1,6 +1,8 @@
+import { fieldGroup } from "../../designer/FieldCatalog";
 import type { Dimension } from "./DimensionDefinitions";
 import type { ViewController } from "../ViewStore";
 export function DimensionAnnotation({
+  intent,
   dimension,
   start,
   end,
@@ -9,6 +11,7 @@ export function DimensionAnnotation({
   active,
   view,
 }: {
+  intent: string;
   dimension: Dimension;
   start: readonly [number, number];
   end: readonly [number, number];
@@ -25,6 +28,9 @@ export function DimensionAnnotation({
       onMouseEnter={() => view.hover(dimension.field)}
       onMouseLeave={() => view.hover(null)}
     >
+      <title>
+        {intent}: {label}
+      </title>
       <path
         className="dimension-line"
         d={`M ${start[0]} ${start[1]} L ${end[0]} ${end[1]}`}
@@ -50,7 +56,7 @@ export function DimensionAnnotation({
             onBlur={() => view.hover(null)}
             onClick={() =>
               view.openEditor(
-                dimension.group,
+                fieldGroup(dimension.field),
                 dimension.field,
                 dimension.explanation ?? null,
               )
@@ -59,7 +65,7 @@ export function DimensionAnnotation({
               if (event.key === "Enter" || event.key === " ") {
                 event.preventDefault();
                 view.openEditor(
-                  dimension.group,
+                  fieldGroup(dimension.field),
                   dimension.field,
                   dimension.explanation ?? null,
                 );

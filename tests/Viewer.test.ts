@@ -8,7 +8,7 @@ describe("preset views and annotation editing", () => {
   it("preserves inspection level and editor selection across camera changes", () => {
     const view = createViewController();
     view.setLevel(3);
-    view.openEditor("surfaces", "distance:panelRearGap");
+    view.openEditor("panel", "distance:panelRearGap");
     view.setPreset("isometric");
     expect(view.store.getSnapshot()).toMatchObject({
       level: 3,
@@ -17,7 +17,7 @@ describe("preset views and annotation editing", () => {
       focusField: "distance:panelRearGap",
     });
     const before = view.store.getSnapshot().focusRequest;
-    view.openEditor("surfaces", "distance:panelRearGap");
+    view.openEditor("panel", "distance:panelRearGap");
     expect(view.store.getSnapshot().focusRequest).toBe(before + 1);
   });
   it("clamps layer navigation and zoom and notifies subscriptions", () => {

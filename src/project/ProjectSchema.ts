@@ -14,7 +14,13 @@ const evidence = z
     note: z.string().max(4000),
   })
   .strict();
-const fact = z.object({ mm: length, evidence }).strict();
+const fact = z
+  .object({
+    mm: length,
+    evidence,
+    confidence: z.enum(["confirmed", "provisional"]).default("provisional"),
+  })
+  .strict();
 const product = z
   .object({
     id: z.string().max(100),
@@ -170,7 +176,15 @@ export function parseProject(value: unknown): Project {
           .slice(0, 3)
           .join(" "),
     );
-  return parsed.data;
+  return {
+    ...parsed.data,
+    distances: Object.fromEntries(
+      Object.entries(parsed.data.distances).map(([id, value]) => [
+        id,
+        { ...value, kind: distanceDefinitions[id as DistanceId].kind },
+      ]),
+    ) as Project["distances"],
+  };
 }
 export function decodeProject(text: string): Project {
   if (text.length > 500000) throw new Error("Project file is too large.");

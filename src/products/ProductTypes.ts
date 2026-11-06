@@ -4,7 +4,11 @@ export type Evidence = Readonly<{
   note: string;
 }>;
 
-export type LengthFact = Readonly<{ mm: number; evidence: Evidence }>;
+export type LengthFact = Readonly<{
+  mm: number;
+  evidence: Evidence;
+  confidence: "confirmed" | "provisional";
+}>;
 export type Product = Readonly<{
   id: string;
   name: string;

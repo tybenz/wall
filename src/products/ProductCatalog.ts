@@ -1,7 +1,11 @@
 import { inches } from "../shared/Units";
 import type { Evidence, LengthFact, ProductCatalog } from "./ProductTypes";
 
-const fact = (mm: number, evidence: Evidence): LengthFact => ({ mm, evidence });
+const fact = (mm: number, evidence: Evidence): LengthFact => ({
+  mm,
+  evidence,
+  confidence: "provisional",
+});
 const television: Evidence = {
   kind: "manufacturer",
   source: "local-reference:television",

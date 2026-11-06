@@ -1,3 +1,4 @@
+import { fieldIsFact, fieldVerified } from "../../designer/FieldCatalog";
 import type { OrthographicCamera } from "three";
 import type { Assembly } from "../../geometry/AssemblyTypes";
 import type { Project } from "../../designer/DesignerTypes";
@@ -73,6 +74,13 @@ export function DimensionOverlay({
           return (
             <DimensionAnnotation
               key={dimension.id}
+              intent={
+                dimension.explanation
+                  ? "Calculated"
+                  : fieldIsFact(dimension.field)
+                    ? `Physical fact · ${fieldVerified(project, dimension.field) ? "verified" : "needs verification"}`
+                    : "Layout"
+              }
               dimension={dimension}
               start={start}
               end={end}

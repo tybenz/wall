@@ -43,7 +43,7 @@ export function getPreviewDimensions(
         tv.z + preview.transform.extension,
       ],
       field: "distance:mountExtension",
-      group: "structure",
+
       offset: [75, 0],
     },
     {
@@ -53,7 +53,7 @@ export function getPreviewDimensions(
       start: [p[0], p[1], base.depth.panelFront],
       end: p,
       field: "distance:mountExtension",
-      group: "structure",
+
       offset: [-90, 0],
       explanation:
         "Minimum signed distance from the moving TV, soundbar and cradle to the flat panel's front plane. Negative means a part crosses that plane; collision findings also check its vertical and horizontal overlap. Increase extension or reduce swivel in Structure.",
@@ -67,7 +67,7 @@ export function getPreviewDimensions(
             start: move([tv.x, tv.y + tv.height, tv.z + tv.depth]),
             end: move([tv.x + tv.width, tv.y + tv.height, tv.z + tv.depth]),
             field: "product:tv:width",
-            group: "products",
+
             offset: [0, -30],
           },
           {
@@ -81,7 +81,7 @@ export function getPreviewDimensions(
               bar.z + bar.depth,
             ]),
             field: "distance:soundbarGap",
-            group: "placement",
+
             offset: [70, 12],
           },
           {
@@ -91,7 +91,7 @@ export function getPreviewDimensions(
             start: move([cradle.x, tv.y, cradle.z + cradle.depth]),
             end: move([cradle.x, cradle.y, cradle.z + cradle.depth]),
             field: "distance:soundbarGap",
-            group: "placement",
+
             offset: [-80, 20],
             explanation:
               "TV bottom to cradle bottom includes the soundbar gap, body height and cradle thickness. All three parts share one rigid mount transform.",

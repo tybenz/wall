@@ -1,7 +1,6 @@
 import { getFocusedDimension } from "./FocusedDimension";
 import { getPart, type Assembly } from "../../geometry/AssemblyTypes";
 import type { Project, FieldId } from "../../designer/DesignerTypes";
-import type { EditorGroup } from "../../designer/DistanceDefinitions";
 import type { ViewSnapshot } from "../ViewStore";
 import type { Point3 } from "../Projection";
 export type Dimension = Readonly<{
@@ -11,7 +10,7 @@ export type Dimension = Readonly<{
   start: Point3;
   end: Point3;
   field: FieldId;
-  group: EditorGroup;
+
   offset?: readonly [number, number];
   explanation?: string;
 }>;
@@ -37,7 +36,7 @@ export function getDimensions(
       start: [x, h * 0.85, 0],
       end: [x, h * 0.85, assembly.depth.slatFront],
       field: "product:slats:depth",
-      group: "products",
+
       offset: [-90, -15],
     });
     result.push({
@@ -47,7 +46,7 @@ export function getDimensions(
       start: [x, panel.y + panel.height, assembly.depth.slatFront],
       end: [x, panel.y + panel.height, assembly.depth.panelRear],
       field: "distance:panelRearGap",
-      group: "surfaces",
+
       offset: [45, -30],
     });
     result.push({
@@ -57,7 +56,7 @@ export function getDimensions(
       start: [x, tv.y + tv.height * 0.7, assembly.depth.panelFront],
       end: [x, tv.y + tv.height * 0.7, assembly.depth.tvRear],
       field: "distance:tvRearGap",
-      group: "placement",
+
       offset: [55, 0],
     });
     result.push({
@@ -67,7 +66,7 @@ export function getDimensions(
       start: [console.x, 60, console.z],
       end: [console.x, 60, console.z + console.depth],
       field: "product:console:depth",
-      group: "products",
+
       offset: [0, 35],
     });
   } else {
@@ -100,7 +99,7 @@ export function getDimensions(
       start: [0, 0, 0],
       end: [w, 0, 0],
       field: "distance:wallWidth",
-      group: "surfaces",
+
       offset: [0, 38],
     });
     result.push({
@@ -114,7 +113,7 @@ export function getDimensions(
         panel.z + panel.depth,
       ],
       field: "distance:panelWidth",
-      group: "surfaces",
+
       offset: [0, -30],
     });
     if (state.level === 0) {
@@ -125,7 +124,7 @@ export function getDimensions(
         start: [w, 0, tv.z],
         end: [w, d.tvCenterHeight.mm, tv.z],
         field: "distance:tvCenterHeight",
-        group: "placement",
+
         offset: [75, 0],
       });
       result.push({
@@ -135,7 +134,7 @@ export function getDimensions(
         start: [tv.x + tv.width, tv.y, bar.z + bar.depth],
         end: [tv.x + tv.width, bar.y + bar.height, bar.z + bar.depth],
         field: "distance:soundbarGap",
-        group: "placement",
+
         offset: [55, 12],
       });
       result.push({
@@ -145,7 +144,7 @@ export function getDimensions(
         start: [tv.x, 0, tv.z],
         end: [tv.x, tv.y, tv.z],
         field: "distance:tvCenterHeight",
-        group: "placement",
+
         offset: [-90, 0],
         explanation:
           "TV bottom = TV center height − half the TV body height. Edit center height here, or body height in Parts.",
@@ -161,7 +160,7 @@ export function getDimensions(
       start: [cradle.x, tv.y, cradle.z + cradle.depth],
       end: [cradle.x, cradle.y, cradle.z + cradle.depth],
       field: "distance:soundbarGap",
-      group: "placement",
+
       offset: [-100, 20],
       explanation:
         "TV bottom to cradle bottom = TV-to-soundbar gap + soundbar housing height in the selected orientation + cradle thickness. Edit the gap here; thickness is in Structure. Cradle geometry is provisional.",
@@ -197,7 +196,7 @@ export function getDimensions(
       start: [0, 0, -d.drywallThickness.mm],
       end: [0, d.blockingBottom.mm, -d.drywallThickness.mm],
       field: "distance:blockingBottom",
-      group: "structure",
+
       offset: [-70, 0],
     });
   }
