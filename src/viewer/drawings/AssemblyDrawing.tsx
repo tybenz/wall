@@ -47,7 +47,7 @@ export function AssemblyDrawing({
           color={p.featurePanel.appearance.color}
         />
       )}
-      <MountAssembly assembly={assembly} />
+      {state.level < 2 && <MountAssembly assembly={assembly} />}
       {state.level === 0 && (
         <>
           <Television
@@ -55,6 +55,14 @@ export function AssemblyDrawing({
             screenOn={state.screenOn}
             color={p.tv.appearance.color}
           />
+          {assembly.construction.cradle.map((bounds, index) => (
+            <SolidPart
+              key={`cradle-${index}`}
+              bounds={bounds}
+              color="#3c4140"
+              radius={1}
+            />
+          ))}
           <Soundbar
             bounds={getPart(assembly, "soundbar").bounds}
             color={p.soundbar.appearance.color}

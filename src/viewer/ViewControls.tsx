@@ -7,7 +7,8 @@ export const inspectionLevels = [
   },
   {
     label: "Behind panel",
-    description: "White panel removed · supports and slat cutouts",
+    description:
+      "Panel and bracket removed · perimeter spacers, mount spacers and lag paths",
   },
   {
     label: "At drywall",

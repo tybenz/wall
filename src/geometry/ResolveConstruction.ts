@@ -1,3 +1,4 @@
+import { resolvePanelSupports } from "./ResolvePanelSupports";
 import { resolveWallProfile, profileCutHeight } from "./WallProfile";
 import type { Project } from "../designer/DesignerTypes";
 import type { Bounds, Construction } from "./AssemblyTypes";
@@ -40,33 +41,32 @@ export function resolveConstruction(
         depth: d.studDepth.mm,
       });
   }
-  const supports = [0.18, 0.82].map((fraction) => ({
-    x: panel.x + panel.width * fraction - 44.45,
-    y: panel.y + panel.height * 0.12,
-    z: 0,
-    width: 88.9,
-    height: panel.height * 0.76,
-    depth: panel.z,
-  }));
-  const boxX = width / 2 + d.electricalOffsetX.mm;
-  const boxes = [d.upperBoxHeight.mm, d.lowerBoxHeight.mm].map((y) => ({
-    x: boxX - 75,
-    y: y - 65,
+  const supportFrame = resolvePanelSupports(project, panel, mount);
+  const mountCenter = mount.x + mount.width / 2;
+  // Bounds describe the visible plate envelope, so gap is measured edge-to-edge.
+  const upper = {
+    x: mountCenter - 75,
+    y: mount.y - d.upperBoxGap.mm - 130,
     z: -70,
     width: 150,
     height: 130,
-    depth: 80,
-  }));
-  const lower = boxes[1],
-    upper = boxes[0];
+    depth: panel.z + panel.depth + 70,
+  };
+  const lower = {
+    ...upper,
+    depth: project.products.slats.depth.mm + 70,
+    x: mountCenter + d.electricalOffsetX.mm - 75,
+    y: d.lowerBoxHeight.mm - 65,
+  };
+  const boxes = [upper, lower];
   const routes = ([-32, 32] as const).map(
     (offset) =>
       [
-        [boxX + offset, lower.y + lower.height / 2, -45],
-        [boxX + offset, lower.y + lower.height + 80, -45],
-        [boxX + offset, upper.y - 80, -45],
-        [boxX + offset, upper.y + upper.height / 2, -45],
+        [lower.x + 75 + offset, lower.y + lower.height / 2, -45],
+        [lower.x + 75 + offset, lower.y + lower.height + 80, -45],
+        [upper.x + 75 + offset, upper.y - 80, -45],
+        [upper.x + 75 + offset, upper.y + upper.height / 2, -45],
       ] as const,
   );
-  return { studs, blocking, supports, boxes, routes };
+  return { studs, blocking, ...supportFrame, boxes, routes, cradle: [] };
 }

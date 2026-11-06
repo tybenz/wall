@@ -193,21 +193,33 @@ export function getFocusedDimension(
         consoleCenter[2],
       ];
       break;
-    case "openingWidth":
-      start = [
-        mount.x + mount.width / 2 - d.openingWidth.mm / 2,
-        mount.y + mount.height / 2,
-        panel.z,
-      ];
-      end = [start[0] + d.openingWidth.mm, start[1], start[2]];
+    case "cradleThickness": {
+      const b = getPart(assembly, "cradle").bounds;
+      start = [b.x, b.y, b.z + b.depth];
+      end = [b.x, b.y + d.cradleThickness.mm, b.z + b.depth];
       break;
-    case "openingHeight":
+    }
+    case "supportSpacing": {
+      const supports = assembly.construction.supports.filter(
+        (b) => b.role === "mount",
+      );
       start = [
-        mount.x + mount.width / 2,
-        mount.y + mount.height / 2 - d.openingHeight.mm / 2,
+        supports[0].x + supports[0].width / 2,
+        supports[0].y + supports[0].height / 2,
         panel.z,
       ];
-      end = [start[0], start[1] + d.openingHeight.mm, start[2]];
+      end = [supports[1].x + supports[1].width / 2, start[1], panel.z];
+      break;
+    }
+    case "supportWidth": {
+      const b = assembly.construction.supports[0];
+      start = [b.x, b.y, panel.z];
+      end = [b.x, b.y + b.height, panel.z];
+      break;
+    }
+    case "supportInset":
+      start = [panel.x, panel.y, panel.z];
+      end = [panel.x + d.supportInset.mm, panel.y, panel.z];
       break;
     case "mountWidth":
       [start, end] = axisDimension(mount, "width", mount.width);
@@ -218,10 +230,6 @@ export function getFocusedDimension(
     case "mountOffsetY":
       start = [tvCenter[0], tvCenter[1], mount.z];
       end = [tvCenter[0], tvCenter[1] + d.mountOffsetY.mm, mount.z];
-      break;
-    case "mountSpacerDepth":
-      start = [tvCenter[0], tvCenter[1], 0];
-      end = [tvCenter[0], tvCenter[1], d.mountSpacerDepth.mm];
       break;
     case "blockingBottom":
       start = [tvCenter[0], 0, -d.drywallThickness.mm];
@@ -240,12 +248,12 @@ export function getFocusedDimension(
       end = [start[0], start[1] + d.blockingHeight.mm, start[2]];
       break;
     case "electricalOffsetX":
-      start = [w / 2, boxCenter[1], 0];
-      end = [boxCenter[0], boxCenter[1], 0];
+      start = [mount.x + mount.width / 2, d.lowerBoxHeight.mm, 0];
+      end = [start[0] + d.electricalOffsetX.mm, start[1], 0];
       break;
-    case "upperBoxHeight":
-      start = [boxCenter[0], 0, 0];
-      end = [boxCenter[0], d.upperBoxHeight.mm, 0];
+    case "upperBoxGap":
+      start = [boxCenter[0], upper.y + upper.height, 0];
+      end = [boxCenter[0], mount.y, 0];
       break;
     case "lowerBoxHeight":
       start = [boxCenter[0], 0, 0];

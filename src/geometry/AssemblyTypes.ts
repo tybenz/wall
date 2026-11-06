@@ -7,9 +7,9 @@ export type PartId =
   | "featurePanel"
   | "tv"
   | "soundbar"
+  | "cradle"
   | "console"
-  | "mount"
-  | "mountSpacer";
+  | "mount";
 export type Bounds = Readonly<{
   x: number;
   y: number;
@@ -37,10 +37,17 @@ export type Finding = Readonly<{
   message: string;
   severity?: "info" | "warning";
 }>;
+export type Spacer = Bounds & Readonly<{ role: "perimeter" | "mount" }>;
+export type LagPath = Readonly<{
+  start: readonly [number, number, number];
+  end: readonly [number, number, number];
+}>;
 export type Construction = Readonly<{
   studs: readonly Bounds[];
   blocking: readonly Bounds[];
-  supports: readonly Bounds[];
+  supports: readonly Spacer[];
+  lagPaths: readonly LagPath[];
+  cradle: readonly Bounds[];
   boxes: readonly Bounds[];
   routes: readonly (readonly (readonly [number, number, number])[])[];
 }>;

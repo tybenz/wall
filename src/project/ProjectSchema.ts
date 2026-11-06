@@ -77,10 +77,31 @@ export const projectSchema = z
           "note" in legacyHeight &&
           typeof legacyHeight.note === "string" &&
           legacyHeight.note.startsWith("Simplified rectangular wall");
+        const {
+          openingWidth: _openingWidth,
+          openingHeight: _openingHeight,
+          mountSpacerDepth: _mountSpacerDepth,
+          upperBoxHeight: _upperBoxHeight,
+          ...current
+        } = original;
         return {
+          cradleThickness: defaults.cradleThickness,
+          upperBoxGap: defaults.upperBoxGap,
+          supportSpacing: defaults.supportSpacing,
+          supportWidth: defaults.supportWidth,
+          supportInset: defaults.supportInset,
           ...Object.fromEntries(added.map((id) => [id, defaults[id]])),
-          ...original,
+          ...current,
           ...(upgradeHeight ? { wallHeight: defaults.wallHeight } : {}),
+          ...(typeof original.soundbarGap === "object" &&
+          original.soundbarGap !== null &&
+          "mm" in original.soundbarGap &&
+          original.soundbarGap.mm === 25.4 &&
+          "note" in original.soundbarGap &&
+          original.soundbarGap.note ===
+            "TV bottom to soundbar top; bar assumed flat."
+            ? { soundbarGap: defaults.soundbarGap }
+            : {}),
         };
       },
       z.record(z.enum(distanceKeys), distance).superRefine((values, ctx) => {

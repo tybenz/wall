@@ -152,18 +152,44 @@ export function getDimensions(
       });
     }
   }
-  if (state.level === 4) {
-    const box = assembly.construction.boxes[0];
+  if (state.level === 0) {
+    const cradle = getPart(assembly, "cradle").bounds;
     result.push({
-      id: "upper-box",
-      label: "Upper box center",
-      mm: d.upperBoxHeight.mm,
-      start: [box.x + box.width / 2, 0, 0],
-      end: [box.x + box.width / 2, d.upperBoxHeight.mm, 0],
-      field: "distance:upperBoxHeight",
-      group: "electrical",
-      offset: [70, 0],
+      id: "cradle-drop",
+      label: "TV bottom → cradle bottom",
+      mm: tv.y - cradle.y,
+      start: [cradle.x, tv.y, cradle.z + cradle.depth],
+      end: [cradle.x, cradle.y, cradle.z + cradle.depth],
+      field: "distance:soundbarGap",
+      group: "placement",
+      offset: [-100, 20],
+      explanation:
+        "TV bottom to cradle bottom = TV-to-soundbar gap + soundbar housing height in the selected orientation + cradle thickness. Edit the gap here; thickness is in Structure. Cradle geometry is provisional.",
     });
+  }
+  if (state.level >= 1) {
+    const gap = getFocusedDimension("distance:upperBoxGap", project, assembly)!;
+    result.push({
+      ...gap,
+      id: "upper-box-gap",
+      label: "Bracket → plates",
+      offset: [75, 0],
+    });
+  }
+  if (state.level >= 2) {
+    const spacing = getFocusedDimension(
+      "distance:supportSpacing",
+      project,
+      assembly,
+    )!;
+    result.push({
+      ...spacing,
+      id: "mount-spacer-spacing",
+      label: "Mount spacers · O.C.",
+      offset: [0, -30],
+    });
+  }
+  if (state.level === 4) {
     result.push({
       id: "blocking-height",
       label: "Blocking bottom",

@@ -45,13 +45,17 @@ export function createInitialProject(): Project {
         0.875,
         "Visual estimate; finish and fluting proportions remain adjustable.",
       ),
-      openingWidth: preference(
-        22,
-        "Illustrative mount access opening; verify actual mount sweep.",
+      supportSpacing: measurement(
+        16,
+        "User layout: two vertical mount spacers at 16 inches on center, centered on TV mount.",
       ),
-      openingHeight: preference(
-        15,
-        "Illustrative mount access opening; verify actual mount sweep.",
+      supportWidth: preference(
+        3.5,
+        "Illustrative spacer face width; actual stock not specified.",
+      ),
+      supportInset: preference(
+        2,
+        "Illustrative inset of perimeter frame from flat panel edges.",
       ),
       mountWidth: measurement(
         16,
@@ -61,10 +65,6 @@ export function createInitialProject(): Project {
       mountOffsetY: measurement(
         -2,
         "Unmeasured mount datum; not a VESA offset or bolt schedule.",
-      ),
-      mountSpacerDepth: preference(
-        2,
-        "Structural spacer bears on drywall/framing, never rounded ribs.",
       ),
       blockingBottom: preference(
         45,
@@ -79,10 +79,13 @@ export function createInitialProject(): Project {
         "Zone centered on TV; boards fill available stud bays.",
       ),
       electricalOffsetX: preference(
-        26,
-        "Illustrative combined boxes; confirm bay and access.",
+        0,
+        "Lower box offset relative to mount center; upper plates always track mount center.",
       ),
-      upperBoxHeight: preference(50, "Unverified upper box center."),
+      upperBoxGap: preference(
+        2,
+        "User layout: 2-inch clear vertical separation from mount wall plate bottom to upper electrical plates top; group centered on mount.",
+      ),
       lowerBoxHeight: preference(12, "Unverified lower box center."),
       wallWidth: measurement(
         103,
@@ -141,9 +144,13 @@ export function createInitialProject(): Project {
         1,
         "White panel front to TV rear envelope. Placeholder, not mount collapsed depth.",
       ),
+      cradleThickness: preference(
+        0.25,
+        "Illustrative cradle material thickness only; actual accessory dimensions are unverified.",
+      ),
       soundbarGap: preference(
-        1,
-        "TV bottom to soundbar top; bar assumed flat.",
+        0.25,
+        "User preference: quarter-inch clearance from TV bottom to soundbar top; cradle follows TV swivel mount.",
       ),
       consoleWallGap: preference(
         1,

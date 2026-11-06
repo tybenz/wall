@@ -1,3 +1,4 @@
+import { resolveCradle } from "./ResolveCradle";
 import { resolveWallProfile, profileCutHeight } from "./WallProfile";
 import type { Project } from "../designer/DesignerTypes";
 import { resolveConstruction } from "./ResolveConstruction";
@@ -36,16 +37,10 @@ export function resolveAssembly(project: Project): Assembly {
   const mount = {
     x: cx - d.mountWidth.mm / 2,
     y: cy + d.mountOffsetY.mm - d.mountHeight.mm / 2,
-    z: d.mountSpacerDepth.mm,
+    z: panelFront,
     width: d.mountWidth.mm,
     height: d.mountHeight.mm,
-    depth: Math.max(5, tvRear - d.mountSpacerDepth.mm),
-  };
-  const opening = {
-    x: cx - d.openingWidth.mm / 2,
-    y: cy + d.mountOffsetY.mm - d.openingHeight.mm / 2,
-    width: d.openingWidth.mm,
-    height: d.openingHeight.mm,
+    depth: Math.max(5, tvRear - panelFront),
   };
   const construction = resolveConstruction(project, panel, mount);
   const vertical = project.soundbarOrientation === "vertical";
@@ -89,20 +84,11 @@ export function resolveAssembly(project: Project): Assembly {
         depth: p.slats.depth.mm,
       }),
       topProfile: wallProfile,
-      openings: [
-        ...construction.supports,
-        {
-          ...mount,
-          x: mount.x - 20,
-          y: mount.y - 20,
-          width: mount.width + 40,
-          height: mount.height + 40,
-        },
-      ],
+      openings: [...construction.supports, ...construction.boxes],
     },
     {
       ...part("featurePanel", "White feature panel", panel),
-      openings: [opening],
+      openings: [construction.boxes[0]],
     },
     part("tv", "TV envelope", {
       x: cx - p.tv.width.mm / 2,
@@ -129,15 +115,15 @@ export function resolveAssembly(project: Project): Assembly {
       depth: p.console.depth.mm,
     }),
     part("mount", "Mount envelope", mount),
-    part("mountSpacer", "Structural mount spacer", {
-      x: mount.x - 20,
-      y: mount.y - 20,
-      z: 0,
-      width: mount.width + 40,
-      height: mount.height + 40,
-      depth: d.mountSpacerDepth.mm,
-    }),
   ];
+  const cradle = resolveCradle(
+    parts.find((part) => part.id === "soundbar")!.bounds,
+    parts.find((part) => part.id === "tv")!.bounds,
+    mount,
+    d.cradleThickness.mm,
+  );
+  parts.push(part("cradle", "Soundbar cradle", cradle.bounds));
+  const resolvedConstruction = { ...construction, cradle: cradle.members };
   const panels = Math.ceil(w / p.slats.width.mm),
     cartons = Math.ceil(panels / 2);
   const findings: Assembly["findings"][number][] = [
@@ -199,6 +185,11 @@ export function resolveAssembly(project: Project): Assembly {
       );
   }
   const bar = parts.find((part) => part.id === "soundbar")!.bounds;
+  if (cradle.members.some((member) => intersects(panel, member)))
+    warn(
+      "cradle-panel-overlap",
+      "The illustrative cradle intersects the flat panel; adjust forward offset or TV rear gap.",
+    );
   if (intersects(panel, bar))
     warn(
       "soundbar-panel-overlap",
@@ -210,29 +201,52 @@ export function resolveAssembly(project: Project): Assembly {
       "Soundbar envelope intersects the console.",
     );
   if (
-    opening.x <= panel.x ||
-    opening.y <= panel.y ||
-    opening.x + opening.width >= panel.x + panel.width ||
-    opening.y + opening.height >= panel.y + panel.height
+    construction.supports.some(
+      (b) =>
+        b.x < panel.x ||
+        b.y < panel.y ||
+        b.x + b.width > panel.x + panel.width ||
+        b.y + b.height > panel.y + panel.height,
+    )
   )
     warn(
-      "opening-outside-panel",
-      "Mount opening reaches beyond the panel edge; no cutout is drawn until it fits.",
+      "spacer-outside-panel",
+      "A spacer extends beyond the flat panel; adjust panel size, offsets, spacer spacing or inset.",
     );
-  if (d.mountSpacerDepth.mm >= tvRear)
+  if (d.supportSpacing.mm < d.supportWidth.mm)
     warn(
-      "mount-clearance",
-      "Mount spacer reaches the TV rear. There is no room for the mount envelope.",
+      "spacer-overlap",
+      "Mount spacers overlap; their center spacing is smaller than their face width.",
+    );
+  const containsPoint = (b: Bounds, x: number, y: number, z: number) =>
+    x >= b.x &&
+    x <= b.x + b.width &&
+    y >= b.y &&
+    y <= b.y + b.height &&
+    z >= b.z &&
+    z <= b.z + b.depth;
+  if (
+    construction.lagPaths.some(
+      ({ start: [x, y], end: [, , z] }) =>
+        !construction.blocking.some((b) => containsPoint(b, x, y, z)),
+    )
+  )
+    warn(
+      "lag-misses-blocking",
+      "A schematic mount lag path misses the blocking behind drywall; adjust blocking position or extent.",
     );
   if (
-    mount.x < opening.x ||
-    mount.x + mount.width > opening.x + opening.width ||
-    mount.y < opening.y ||
-    mount.y + mount.height > opening.y + opening.height
+    construction.lagPaths.some(
+      ({ start: [x, y] }) =>
+        x < mount.x - 0.01 ||
+        x > mount.x + mount.width + 0.01 ||
+        y < mount.y - 0.01 ||
+        y > mount.y + mount.height + 0.01,
+    )
   )
     warn(
-      "opening-mount",
-      "Mount plate extends beyond the proposed access opening.",
+      "lag-outside-mount",
+      "The mount plate envelope does not span the proposed lag paths. Verify the actual plate and hole locations.",
     );
   if (
     construction.boxes.some(
@@ -278,7 +292,7 @@ export function resolveAssembly(project: Project): Assembly {
   return {
     parts,
     wallProfile,
-    construction,
+    construction: resolvedConstruction,
     depth: { slatFront, panelRear, panelFront, tvRear, tvFront },
     coverage: { panels, cartons, nominalWidth: cartons * 2 * p.slats.width.mm },
     findings,

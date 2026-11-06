@@ -98,4 +98,42 @@ describe("project persistence", () => {
       controller.store.getSnapshot().project.distances.tvCenterHeight.mm,
     ).toBe(1400);
   });
+  it("loads the earlier mount-opening layout into the spacer-frame layout while keeping custom values", () => {
+    const initial = createInitialProject();
+    const distances: Record<string, unknown> = { ...initial.distances };
+    for (const id of [
+      "supportSpacing",
+      "supportWidth",
+      "supportInset",
+      "upperBoxGap",
+      "cradleThickness",
+    ])
+      delete distances[id];
+    for (const id of [
+      "openingWidth",
+      "openingHeight",
+      "mountSpacerDepth",
+      "upperBoxHeight",
+    ])
+      distances[id] = { ...initial.distances.panelWidth, mm: 100 };
+    distances.soundbarGap = {
+      ...initial.distances.soundbarGap,
+      mm: inches(1),
+      note: "TV bottom to soundbar top; bar assumed flat.",
+    };
+    const upgraded = decodeProject(JSON.stringify({ ...initial, distances }));
+    expect(upgraded.distances.supportSpacing.mm).toBeCloseTo(inches(16));
+    expect(upgraded.distances.upperBoxGap.mm).toBeCloseTo(inches(2));
+    expect(upgraded.distances.soundbarGap.mm).toBeCloseTo(inches(0.25));
+    expect(upgraded.distances).not.toHaveProperty("openingWidth");
+    distances.soundbarGap = {
+      ...initial.distances.soundbarGap,
+      mm: inches(0.5),
+      note: "TV bottom to soundbar top; bar assumed flat.",
+    };
+    expect(
+      decodeProject(JSON.stringify({ ...initial, distances })).distances
+        .soundbarGap.mm,
+    ).toBeCloseTo(inches(0.5));
+  });
 });

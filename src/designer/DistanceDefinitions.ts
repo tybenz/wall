@@ -97,6 +97,12 @@ export const distanceDefinitions = {
     min: 0,
     max: 1000,
   },
+  cradleThickness: {
+    label: "Cradle thickness (provisional)",
+    group: "structure",
+    min: 1,
+    max: 50,
+  },
   soundbarGap: {
     label: "TV bottom → soundbar top",
     group: "placement",
@@ -133,17 +139,23 @@ export const distanceDefinitions = {
     min: 10,
     max: 100,
   },
-  openingWidth: {
-    label: "White panel mount opening width",
+  supportSpacing: {
+    label: "Mount spacer spacing on center",
     group: "structure",
     min: 50,
     max: 2000,
   },
-  openingHeight: {
-    label: "White panel mount opening height",
+  supportWidth: {
+    label: "Spacer face width",
     group: "structure",
-    min: 50,
-    max: 2000,
+    min: 10,
+    max: 300,
+  },
+  supportInset: {
+    label: "Perimeter spacer inset from panel edge",
+    group: "structure",
+    min: 0,
+    max: 500,
   },
   mountWidth: {
     label: "Mount wall plate width",
@@ -162,12 +174,6 @@ export const distanceDefinitions = {
     group: "structure",
     min: -1000,
     max: 1000,
-  },
-  mountSpacerDepth: {
-    label: "Drywall → mount spacer face",
-    group: "structure",
-    min: 1,
-    max: 500,
   },
   blockingBottom: {
     label: "Blocking bottom above floor",
@@ -188,16 +194,16 @@ export const distanceDefinitions = {
     max: 5000,
   },
   electricalOffsetX: {
-    label: "Boxes offset from wall center",
+    label: "Lower box offset from mount center",
     group: "electrical",
     min: -5000,
     max: 5000,
   },
-  upperBoxHeight: {
-    label: "Upper box center above floor",
+  upperBoxGap: {
+    label: "Mount bracket bottom → electrical plates top",
     group: "electrical",
-    min: 100,
-    max: 10000,
+    min: 0,
+    max: 1000,
   },
   lowerBoxHeight: {
     label: "Lower box center above floor",

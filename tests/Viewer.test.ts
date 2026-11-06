@@ -73,4 +73,33 @@ describe("preset views and annotation editing", () => {
     expect(depth?.mm).toBeCloseTo(11.938);
     expect(depth?.field).toBe("product:slats:depth");
   });
+  it("measures the cradle bottom from TV bottom across orientation and placement changes", () => {
+    const base = createInitialProject();
+    for (const orientation of ["flat", "vertical"] as const) {
+      const project = {
+        ...base,
+        soundbarOrientation: orientation,
+        distances: {
+          ...base.distances,
+          tvCenterHeight: { ...base.distances.tvCenterHeight, mm: 1500 },
+        },
+      };
+      const assembly = resolveAssembly(project);
+      const tv = assembly.parts.find((p) => p.id === "tv")!.bounds;
+      const bar = assembly.parts.find((p) => p.id === "soundbar")!.bounds;
+      const cradle = assembly.parts.find((p) => p.id === "cradle")!.bounds;
+      expect(tv.y - bar.y - bar.height).toBeCloseTo(6.35);
+      expect(bar.y - cradle.y).toBeCloseTo(
+        project.distances.cradleThickness.mm,
+      );
+      const dimension = getDimensions(
+        project,
+        assembly,
+        createViewController().store.getSnapshot(),
+      ).find((d) => d.id === "cradle-drop");
+      expect(dimension?.mm).toBeCloseTo(tv.y - cradle.y);
+      expect(dimension?.explanation).toContain("cradle thickness");
+      expect(assembly.construction.cradle).toHaveLength(6);
+    }
+  });
 });

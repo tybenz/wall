@@ -1,6 +1,5 @@
 import { Line } from "@react-three/drei";
 import type { Assembly } from "../../geometry/AssemblyTypes";
-import { getPart } from "../../geometry/AssemblyTypes";
 import type { ViewSnapshot } from "../ViewStore";
 import { SolidPart } from "./SolidPart";
 export function ConstructionDrawing({
@@ -27,16 +26,24 @@ export function ConstructionDrawing({
             <SolidPart
               key={`support-${index}`}
               bounds={bounds}
-              color="#d7bf9b"
+              color={bounds.role === "mount" ? "#93a87d" : "#d7bf9b"}
             />
           ))}
-          <SolidPart
-            bounds={getPart(assembly, "mountSpacer").bounds}
-            color="#3a3630"
-          />
+          {state.level >= 2 &&
+            c.lagPaths.map((path, index) => (
+              <Line
+                key={`lag-${index}`}
+                points={[[...path.start], [...path.end]]}
+                color="#6c8055"
+                lineWidth={2}
+                dashed
+                dashSize={12}
+                gapSize={8}
+              />
+            ))}
         </>
       )}
-      {state.showElectrical && state.level >= 3 && (
+      {state.showElectrical && state.level >= 1 && (
         <>
           {c.boxes.map((b, index) => (
             <group key={index}>
