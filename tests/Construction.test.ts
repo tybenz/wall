@@ -90,10 +90,10 @@ describe("construction geometry", () => {
       controller.setDistance(id, value);
       const assembly = controller.store.getSnapshot().assembly;
       const mount = getPart(assembly, "mount").bounds;
-      const plate = assembly.construction.boxes[0];
+      const plate = assembly.construction.plates[0];
       expect(plate.x + plate.width / 2).toBeCloseTo(mount.x + mount.width / 2);
       expect(mount.y - plate.y - plate.height).toBeCloseTo(inches(2));
-      expect(plate.z + plate.depth).toBeCloseTo(assembly.depth.panelFront);
+      expect(plate.z).toBeCloseTo(assembly.depth.panelFront);
     }
     controller.setDistance("blockingBottom", inches(70));
     expect(

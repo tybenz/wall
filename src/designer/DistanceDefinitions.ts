@@ -1,4 +1,77 @@
 export const distanceDefinitions = {
+  studWidth: {
+    label: "Stud face width",
+    group: "structure",
+    min: 10,
+    max: 300,
+  },
+  blockingDepth: {
+    label: "Blocking depth behind drywall",
+    group: "structure",
+    min: 1,
+    max: 500,
+  },
+  lagEmbedment: {
+    label: "Lag embedment into blocking",
+    group: "structure",
+    min: 1,
+    max: 300,
+  },
+  lagRowSpacing: {
+    label: "Mount lag rows on center",
+    group: "structure",
+    min: 1,
+    max: 1000,
+  },
+  plateWidth: {
+    label: "Electrical plate group width",
+    group: "electrical",
+    min: 20,
+    max: 1000,
+  },
+  plateHeight: {
+    label: "Electrical plate group height",
+    group: "electrical",
+    min: 20,
+    max: 1000,
+  },
+  boxWidth: {
+    label: "Electrical rough opening width",
+    group: "electrical",
+    min: 10,
+    max: 1000,
+  },
+  boxHeight: {
+    label: "Electrical rough opening height",
+    group: "electrical",
+    min: 10,
+    max: 1000,
+  },
+  boxDepth: {
+    label: "Electrical box depth into cavity",
+    group: "electrical",
+    min: 1,
+    max: 500,
+  },
+  routeDepth: {
+    label: "Cable route behind drywall back",
+    group: "electrical",
+    min: 1,
+    max: 500,
+  },
+  powerRouteOffsetX: {
+    label: "Power route offset from wall center",
+    group: "electrical",
+    min: -5000,
+    max: 5000,
+  },
+  signalRouteOffsetX: {
+    label: "Low-voltage route offset from wall center",
+    group: "electrical",
+    min: -5000,
+    max: 5000,
+  },
+
   mountExtension: {
     label: "Mount extension beyond parked",
     group: "structure",
@@ -204,3 +277,18 @@ export const editorGroups: readonly { id: EditorGroup; label: string }[] = [
   { id: "structure", label: "Structure" },
   { id: "electrical", label: "Electrical" },
 ];
+
+export const constructionDistanceIds = [
+  "studWidth",
+  "blockingDepth",
+  "lagEmbedment",
+  "lagRowSpacing",
+  "plateWidth",
+  "plateHeight",
+  "boxWidth",
+  "boxHeight",
+  "boxDepth",
+  "routeDepth",
+  "powerRouteOffsetX",
+  "signalRouteOffsetX",
+] as const;

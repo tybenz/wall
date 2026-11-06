@@ -49,6 +49,7 @@ export type Construction = Readonly<{
   lagPaths: readonly LagPath[];
   cradle: readonly Bounds[];
   boxes: readonly Bounds[];
+  plates: readonly Bounds[];
   routes: readonly (readonly (readonly [number, number, number])[])[];
 }>;
 export type Assembly = Readonly<{

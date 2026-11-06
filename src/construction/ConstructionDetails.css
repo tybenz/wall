@@ -1,0 +1,176 @@
+.workspace-mode {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.workspace-mode p {
+  font-size: 11px;
+  color: #7c8c77;
+  margin: 0;
+}
+.construction-details {
+  background: #fffefa;
+  border: 1px solid #dce2d4;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+.construction-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 14px 20px;
+  border-bottom: 1px solid #e1e6d8;
+  background: #f1f3ec;
+}
+.construction-tabs button {
+  font-size: 12px;
+}
+.construction-tabs button[aria-pressed="true"] {
+  background: #344e3e;
+  color: #fffefa;
+  border-color: #344e3e;
+}
+.construction-heading {
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 20px 24px 0;
+}
+.construction-heading p {
+  font-size: 12px;
+  color: #7c8c77;
+  line-height: 1.6;
+  max-width: 760px;
+}
+.construction-heading button {
+  white-space: nowrap;
+  font-size: 12px;
+}
+.construction-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 285px;
+  align-items: start;
+}
+.section-figure {
+  min-width: 0;
+  padding: 12px;
+}
+.section-figure svg {
+  width: 100%;
+  min-height: 280px;
+  display: block;
+  background: #f6f5ef;
+  border-radius: 8px;
+}
+.section-figure svg text {
+  font: 12px system-ui;
+  fill: #6c7e62;
+}
+.section-grid line {
+  stroke: #dce2d4;
+  stroke-dasharray: 3 5;
+}
+.section-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 10px;
+  color: #6f7d64;
+  margin: 14px 6px;
+}
+.section-legend span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.section-legend i {
+  width: 12px;
+  height: 9px;
+  border: 1px solid #909b85;
+}
+.section-axis {
+  font-size: 10px;
+  color: #89967e;
+  margin: 10px 6px;
+  line-height: 1.6;
+}
+.construction-schedule {
+  padding: 4px 22px 20px;
+  border-left: 1px solid #e1e6d8;
+}
+.construction-schedule p {
+  font-size: 10px;
+  line-height: 1.6;
+  color: #89967e;
+}
+.construction-schedule dl {
+  font-size: 11px;
+}
+.construction-schedule dl > div {
+  padding: 9px 0;
+  border-bottom: 1px solid #e7ebdf;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+}
+.construction-schedule dt {
+  color: #728169;
+  line-height: 1.5;
+}
+.construction-schedule dd {
+  margin: 0;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.construction-schedule dd button {
+  padding: 2px 5px;
+  border-color: transparent;
+  opacity: 0.55;
+}
+.construction-schedule dd button:hover,
+.construction-schedule dd button:focus-visible {
+  opacity: 1;
+}
+@media (max-width: 1100px) {
+  .construction-body {
+    grid-template-columns: 1fr;
+  }
+  .construction-schedule {
+    border-left: 0;
+    border-top: 1px solid #e1e6d8;
+  }
+  .construction-schedule dl {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 24px;
+  }
+}
+@media (max-width: 600px) {
+  .workspace-mode {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .construction-heading {
+    padding: 14px;
+    flex-direction: column;
+    gap: 0;
+  }
+  .construction-schedule dl {
+    grid-template-columns: 1fr;
+  }
+  .construction-tabs {
+    padding: 12px;
+  }
+}
+.construction-tabs .construction-export {
+  order: 1;
+  margin-left: auto;
+}

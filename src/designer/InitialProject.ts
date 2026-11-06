@@ -24,6 +24,55 @@ export function createInitialProject(): Project {
     soundbarOrientation: "flat",
     mountSwivelDegrees: 30,
     distances: {
+      studWidth: measurement(
+        1.5,
+        "Assumed stud face width; verify actual framing stock.",
+      ),
+      blockingDepth: measurement(
+        3.5,
+        "Provisional blocking depth; front face is flush with the back of drywall.",
+      ),
+      lagEmbedment: measurement(
+        1.75,
+        "Proposed embedment from blocking front face; not a fastener specification.",
+      ),
+      lagRowSpacing: measurement(
+        4.5,
+        "Illustrative vertical hole spacing, centered on the mount plate. Measure actual holes.",
+      ),
+      plateWidth: measurement(
+        5.905511811023622,
+        "Unmeasured combined power / low-voltage plate envelope.",
+      ),
+      plateHeight: measurement(
+        5.118110236220473,
+        "Unmeasured combined plate height; upper plate top tracks the bracket gap.",
+      ),
+      boxWidth: measurement(
+        5.118110236220473,
+        "Unmeasured combined box / rough-opening envelope. Separate compartments remain schematic.",
+      ),
+      boxHeight: measurement(
+        4.330708661417323,
+        "Unmeasured rough-opening height, centered behind the plate group.",
+      ),
+      boxDepth: measurement(
+        2.25,
+        "Depth behind the back of drywall; the box extends forward to the finished surface.",
+      ),
+      routeDepth: measurement(
+        1.25,
+        "Illustrative in-wall route plane, measured behind the back of drywall.",
+      ),
+      powerRouteOffsetX: measurement(
+        -1.25,
+        "Proposed vertical power route; penetrations through framing are not modeled.",
+      ),
+      signalRouteOffsetX: measurement(
+        1.25,
+        "Proposed vertical signal route; independent of the power route.",
+      ),
+
       mountExtension: preference(
         18,
         "Additional TV-rear travel from the parked position. Provisional preview range, not verified mount reach.",

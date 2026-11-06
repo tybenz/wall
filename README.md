@@ -20,13 +20,16 @@ Open the `/wall/` URL printed by Vite, normally http://localhost:5173/wall/. The
 - Move through **Finished → Behind TV → Behind panel → At drywall → Inside wall**. The inspection level survives camera changes.
 - Hover or focus a dimension for emphasis. Its adjacent edit button opens the right drawer and selects its controlling input. Calculated dimensions explain their inputs.
 - Use the drawer to edit placement, surfaces, part sizes/finishes, stud offsets, schematic mounting geometry and electrical positions. Valid numbers update the drawing immediately. Inputs use the selected inch/mm display unit; the model stores millimeters.
+- Open **Construction details** for a framing elevation or fixed sections through a mount lag, upper electrical box and panel edge. Each dimension arrow focuses its source input. Plate sizes, rough openings, box/cavity depths, blocking depth, lag row spacing/embedment and in-wall route positions are editable.
+- Use **Layout alternatives** to save named snapshots in this browser, compare construction/layout settings and apply a saved layout.
+- **Export construction sheet** downloads a standalone SVG containing all four construction views, dimensions, model findings and unresolved measurements.
 - **Save locally** stores the current design in this browser. The next visit restores the last save. **Load** restores it explicitly; **Export / Import** transfer versioned JSON files. Reset keeps the saved copy. Unsaved edits are not automatically persisted.
 
-V1/v1.5 are complete; the first v2 mount-position slice is ready for hands-on testing. See [V2 scope and checks](docs/V2.md). Read [Architecture](docs/Architecture.md), [Requirements](docs/Requirements.md) and the [testing guide](docs/Testing.md).
+V1/v1.5 are complete; v2 mount previews and construction planning are ready for hands-on testing. See [V2 scope and checks](docs/V2.md). Read [Architecture](docs/Architecture.md), [Requirements](docs/Requirements.md) and the [testing guide](docs/Testing.md).
 
 ## Limits
 
-Product silhouettes, textures and rib pitch are illustrative. Wall, mount, cradle, blocking, spacers, boxes and cable geometry remain provisional until measured. Layer inspection is not a structural or electrical installation approval. Checks cover selected envelope conflicts and stock dimensions, not continuous articulation paths, fastener design, cable bend radius or code compliance. The preview arm and motion limits are schematic, not measured mount kinematics. Camera/view settings are session-only; saved projects retain design data.
+Product silhouettes, textures and rib pitch are illustrative. Wall, mount, cradle, blocking, spacers, boxes and cable geometry remain provisional until measured. Layer inspection is not a structural or electrical installation approval. Checks cover selected envelope conflicts and stock dimensions, not continuous articulation paths, fastener design, cable bend radius or code compliance. The preview arm and motion limits are schematic, not measured mount kinematics. External cable lengths/slack are out of scope. Cable routes represent proposed in-wall paths; framing penetrations are not modeled. Box and rough-opening envelopes are combined schematic groups, not separate measured electrical compartments. Camera/view settings are session-only; saved projects retain design data. Named alternatives use a separate browser library; project JSON exports only the current design.
 
 ## Local references and deployment
 

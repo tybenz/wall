@@ -1,8 +1,11 @@
+import type { ConstructionView } from "../construction/ConstructionSections";
 import type { MountPreset } from "../geometry/MountMotion";
 import type { FieldId } from "../designer/DesignerTypes";
 import type { EditorGroup } from "../designer/DistanceDefinitions";
 export type CameraPreset = "front" | "side" | "isometric";
 export type ViewSnapshot = Readonly<{
+  workspace: "assembly" | "construction";
+  constructionView: ConstructionView;
   preset: CameraPreset;
   mountPreset: MountPreset;
   level: number;
@@ -23,6 +26,8 @@ export type ViewSnapshot = Readonly<{
 }>;
 export function createViewController() {
   let snapshot: ViewSnapshot = Object.freeze({
+    workspace: "assembly",
+    constructionView: "framing",
     preset: "front",
     mountPreset: "parked",
     level: 0,
@@ -57,6 +62,10 @@ export function createViewController() {
   };
   return {
     store,
+    setWorkspace: (workspace: ViewSnapshot["workspace"]) =>
+      update({ workspace }),
+    setConstructionView: (constructionView: ConstructionView) =>
+      update({ constructionView }),
     setMountPreset: (mountPreset: MountPreset) => update({ mountPreset }),
     setPreset: (preset: CameraPreset) => update({ preset }),
     setLevel: (level: number) =>

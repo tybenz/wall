@@ -43,11 +43,11 @@ export function resolvePanelSupports(
     spacer(x - face / 2, verticalBottom, face, verticalHeight, "mount"),
   );
   const lagPaths: LagPath[] = centers.flatMap((x) =>
-    [0.25, 0.75].map((fraction) => {
-      const y = mount.y + mount.height * fraction;
+    [-1, 1].map((side) => {
+      const y = mount.y + mount.height / 2 + (side * d.lagRowSpacing.mm) / 2;
       return {
         start: [x, y, mount.z + 6] as const,
-        end: [x, y, -d.drywallThickness.mm - d.studDepth.mm / 2] as const,
+        end: [x, y, -d.drywallThickness.mm - d.lagEmbedment.mm] as const,
       };
     }),
   );

@@ -2,6 +2,7 @@ import { createInitialProject } from "../designer/InitialProject";
 import { z } from "zod";
 import {
   distanceDefinitions,
+  constructionDistanceIds,
   type DistanceId,
 } from "../designer/DistanceDefinitions";
 import type { Project } from "../designer/DesignerTypes";
@@ -78,6 +79,16 @@ export const projectSchema = z
           typeof legacyHeight.note === "string" &&
           legacyHeight.note.startsWith("Simplified rectangular wall");
         const {
+          powerPortOffsetX: _powerPortOffsetX,
+          signalPortOffsetX: _signalPortOffsetX,
+          powerPortHeight: _powerPortHeight,
+          signalPortHeight: _signalPortHeight,
+          tvPortHeight: _tvPortHeight,
+          powerLeadLength: _powerLeadLength,
+          signalLeadLength: _signalLeadLength,
+          cableSlack: _cableSlack,
+          connectorProjection: _connectorProjection,
+          cableBendSpace: _cableBendSpace,
           tvOffsetX: _tvOffsetX,
           consoleOffsetX: _consoleOffsetX,
           panelOffsetX: _panelOffsetX,
@@ -89,6 +100,9 @@ export const projectSchema = z
           ...current
         } = original;
         return {
+          ...Object.fromEntries(
+            constructionDistanceIds.map((id) => [id, defaults[id]]),
+          ),
           mountExtension: defaults.mountExtension,
           cradleThickness: defaults.cradleThickness,
           upperBoxGap: defaults.upperBoxGap,

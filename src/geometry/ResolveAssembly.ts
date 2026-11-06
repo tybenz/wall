@@ -1,3 +1,4 @@
+import { constructionFindings } from "./ConstructionFindings";
 import { resolveCradle } from "./ResolveCradle";
 import { resolveWallProfile, profileCutHeight } from "./WallProfile";
 import type { Project } from "../designer/DesignerTypes";
@@ -289,6 +290,7 @@ export function resolveAssembly(project: Project): Assembly {
       message:
         "Stud positions are provisional. Enter measured offsets from the left wall edge in Structure.",
     });
+  findings.push(...constructionFindings(project, resolvedConstruction));
   return {
     parts,
     wallProfile,

@@ -85,9 +85,63 @@ export function getFocusedDimension(
   const panelCenter = center(panel),
     tvCenter = center(tv),
     consoleCenter = center(console);
-  const upper = assembly.construction.boxes[0],
+  const upper = assembly.construction.plates[0],
     boxCenter = center(upper);
   switch (id) {
+    case "studWidth": {
+      const b = assembly.construction.studs[0];
+      if (!b) return null;
+      [start, end] = axisDimension(b, "width", b.width);
+      break;
+    }
+    case "blockingDepth":
+    case "lagEmbedment":
+      start = [
+        tvCenter[0],
+        d.blockingBottom.mm + d.blockingHeight.mm / 2,
+        -d.drywallThickness.mm,
+      ];
+      end = [start[0], start[1], start[2] - d[id].mm];
+      break;
+    case "lagRowSpacing": {
+      const lag = assembly.construction.lagPaths;
+      start = lag[0].start;
+      end = lag[1].start;
+      break;
+    }
+    case "plateWidth":
+    case "plateHeight":
+      [start, end] = axisDimension(
+        upper,
+        id === "plateWidth" ? "width" : "height",
+        d[id].mm,
+      );
+      break;
+    case "boxWidth":
+    case "boxHeight": {
+      const box = assembly.construction.boxes[0];
+      [start, end] = axisDimension(
+        box,
+        id === "boxWidth" ? "width" : "height",
+        d[id].mm,
+      );
+      break;
+    }
+    case "boxDepth":
+    case "routeDepth":
+      start = [boxCenter[0], boxCenter[1], -d.drywallThickness.mm];
+      end = [start[0], start[1], start[2] - d[id].mm];
+      break;
+    case "powerRouteOffsetX":
+    case "signalRouteOffsetX":
+      start = [
+        w / 2,
+        d.lowerBoxHeight.mm + 200,
+        -d.drywallThickness.mm - d.routeDepth.mm,
+      ];
+      end = [start[0] + d[id].mm, start[1], start[2]];
+      break;
+
     case "wallWidth":
       start = [0, 0, 0];
       end = [w, 0, 0];

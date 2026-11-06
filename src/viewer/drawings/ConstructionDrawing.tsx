@@ -45,16 +45,16 @@ export function ConstructionDrawing({
       )}
       {state.showElectrical && state.level >= 1 && (
         <>
-          {c.boxes.map((b, index) => (
+          {c.plates.map((b, index) => (
             <group key={index}>
-              <SolidPart bounds={b} color="#54727a" radius={4} />
+              <SolidPart bounds={c.boxes[index]} color="#54727a" radius={4} />
               <SolidPart
                 bounds={{
-                  x: b.x + 7,
-                  y: b.y + 7,
-                  z: b.z + b.depth,
-                  width: b.width - 14,
-                  height: b.height - 14,
+                  x: b.x,
+                  y: b.y,
+                  z: b.z,
+                  width: b.width,
+                  height: b.height,
                   depth: 3,
                 }}
                 color="#e0dfd6"
@@ -64,22 +64,30 @@ export function ConstructionDrawing({
                 <group key={side}>
                   <SolidPart
                     bounds={{
-                      x: b.x + b.width / 2 + side * 30 - 12,
-                      y: b.y + 25,
-                      z: b.z + b.depth + 3,
-                      width: 24,
-                      height: 28,
+                      x:
+                        b.x +
+                        b.width / 2 +
+                        side * b.width * 0.2 -
+                        b.width * 0.08,
+                      y: b.y + b.height * 0.2,
+                      z: b.z + 3,
+                      width: b.width * 0.16,
+                      height: b.height * 0.2,
                       depth: 2,
                     }}
                     color={side < 0 ? "#383f3e" : "#4c6062"}
                   />
                   <SolidPart
                     bounds={{
-                      x: b.x + b.width / 2 + side * 30 - 12,
-                      y: b.y + 77,
-                      z: b.z + b.depth + 3,
-                      width: 24,
-                      height: 28,
+                      x:
+                        b.x +
+                        b.width / 2 +
+                        side * b.width * 0.2 -
+                        b.width * 0.08,
+                      y: b.y + b.height * 0.6,
+                      z: b.z + 3,
+                      width: b.width * 0.16,
+                      height: b.height * 0.2,
                       depth: 2,
                     }}
                     color={side < 0 ? "#383f3e" : "#4c6062"}

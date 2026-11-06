@@ -13,15 +13,18 @@ export function resolveConstruction(
   const z = -d.drywallThickness.mm - d.studDepth.mm;
   const studs = project.studs.positions
     .filter((x) => x >= 0 && x <= width)
+    .sort((a, b) => a - b)
     .map((x) => ({
-      x: Math.max(0, x - 19.05),
+      x: Math.max(0, x - d.studWidth.mm / 2),
       y: 0,
       z,
-      width: Math.min(width, x + 19.05) - Math.max(0, x - 19.05),
+      width:
+        Math.min(width, x + d.studWidth.mm / 2) -
+        Math.max(0, x - d.studWidth.mm / 2),
       height: profileCutHeight(
         profile,
-        Math.max(0, x - 19.05),
-        Math.min(width, x + 19.05),
+        Math.max(0, x - d.studWidth.mm / 2),
+        Math.min(width, x + d.studWidth.mm / 2),
       ),
       depth: d.studDepth.mm,
     }));
@@ -35,38 +38,60 @@ export function resolveConstruction(
       blocking.push({
         x: left,
         y: d.blockingBottom.mm,
-        z,
+        z: -d.drywallThickness.mm - d.blockingDepth.mm,
         width: right - left,
         height: d.blockingHeight.mm,
-        depth: d.studDepth.mm,
+        depth: d.blockingDepth.mm,
       });
   }
   const supportFrame = resolvePanelSupports(project, panel, mount);
   const mountCenter = mount.x + mount.width / 2;
-  // Bounds describe the visible plate envelope, so gap is measured edge-to-edge.
+  // Plates and cavity envelopes are distinct. Cutouts follow the box footprint.
   const upper = {
-    x: mountCenter - 75,
-    y: mount.y - d.upperBoxGap.mm - 130,
-    z: -70,
-    width: 150,
-    height: 130,
-    depth: panel.z + panel.depth + 70,
+    x: mountCenter - d.plateWidth.mm / 2,
+    y: mount.y - d.upperBoxGap.mm - d.plateHeight.mm,
+    z: panel.z + panel.depth,
+    width: d.plateWidth.mm,
+    height: d.plateHeight.mm,
+    depth: 3,
   };
   const lower = {
     ...upper,
-    depth: project.products.slats.depth.mm + 70,
-    x: mountCenter + d.electricalOffsetX.mm - 75,
-    y: d.lowerBoxHeight.mm - 65,
+    z: project.products.slats.depth.mm,
+    x: mountCenter + d.electricalOffsetX.mm - d.plateWidth.mm / 2,
+    y: d.lowerBoxHeight.mm - d.plateHeight.mm / 2,
   };
-  const boxes = [upper, lower];
-  const routes = ([-32, 32] as const).map(
-    (offset) =>
-      [
-        [lower.x + 75 + offset, lower.y + lower.height / 2, -45],
-        [lower.x + 75 + offset, lower.y + lower.height + 80, -45],
-        [upper.x + 75 + offset, upper.y - 80, -45],
-        [upper.x + 75 + offset, upper.y + upper.height / 2, -45],
-      ] as const,
+  const plates = [upper, lower];
+  const boxes = plates.map((plate) => ({
+    x: plate.x + (plate.width - d.boxWidth.mm) / 2,
+    y: plate.y + (plate.height - d.boxHeight.mm) / 2,
+    z: -d.drywallThickness.mm - d.boxDepth.mm,
+    width: d.boxWidth.mm,
+    height: d.boxHeight.mm,
+    depth: d.drywallThickness.mm + d.boxDepth.mm + plate.z,
+  }));
+  const routeZ = -d.drywallThickness.mm - d.routeDepth.mm;
+  const routes = [d.powerRouteOffsetX.mm, d.signalRouteOffsetX.mm].map(
+    (offset, i) => {
+      const routeX = width / 2 + offset;
+      const socketOffset = (i === 0 ? -1 : 1) * Math.min(32, d.boxWidth.mm / 4);
+      const bottomX = lower.x + lower.width / 2 + socketOffset;
+      const topX = upper.x + upper.width / 2 + socketOffset;
+      return [
+        [bottomX, lower.y + lower.height / 2, routeZ],
+        [routeX, lower.y + lower.height + 80, routeZ],
+        [routeX, upper.y - 80, routeZ],
+        [topX, upper.y + upper.height / 2, routeZ],
+      ] as const;
+    },
   );
-  return { studs, blocking, ...supportFrame, boxes, routes, cradle: [] };
+  return {
+    studs,
+    blocking,
+    ...supportFrame,
+    boxes,
+    plates,
+    routes,
+    cradle: [],
+  };
 }

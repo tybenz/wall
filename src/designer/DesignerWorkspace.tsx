@@ -1,3 +1,5 @@
+import { LayoutAlternatives } from "../alternatives/LayoutAlternatives";
+import { ConstructionDetails } from "../construction/ConstructionDetails";
 import { resolveMountPreview } from "../geometry/MountMotion";
 import { MountControls } from "../viewer/MountControls";
 import { useMemo, useState } from "react";
@@ -50,41 +52,83 @@ export function DesignerWorkspace() {
             </span>
           </div>
         </div>
-        <ViewControls view={view} state={state} />
-        <MountControls view={view} state={state} preview={preview} />
-        <WallViewer
+        <LayoutAlternatives
+          controller={controller}
           project={snapshot.project}
-          assembly={snapshot.assembly}
-          preview={preview}
           view={view}
           state={state}
         />
+        <div className="workspace-mode">
+          <div className="segmented" aria-label="Workspace">
+            <button
+              aria-pressed={state.workspace === "assembly"}
+              onClick={() => view.setWorkspace("assembly")}
+            >
+              Assembly
+            </button>
+            <button
+              aria-pressed={state.workspace === "construction"}
+              onClick={() => view.setWorkspace("construction")}
+            >
+              Construction details
+            </button>
+          </div>
+          <p>
+            {state.workspace === "assembly"
+              ? "Layout, layers and mount positions"
+              : "Framing, electrical and wall attachment sections"}
+          </p>
+        </div>
+        {state.workspace === "construction" ? (
+          <ConstructionDetails
+            project={snapshot.project}
+            assembly={snapshot.assembly}
+            view={view}
+            state={state}
+          />
+        ) : (
+          <>
+            <ViewControls view={view} state={state} />
+            <MountControls view={view} state={state} preview={preview} />
+            <WallViewer
+              project={snapshot.project}
+              assembly={snapshot.assembly}
+              preview={preview}
+              view={view}
+              state={state}
+            />
+          </>
+        )}
         <div className="view-options">
-          <label>
-            <input
-              type="checkbox"
-              checked={state.level < 4 && state.showSupports}
-              disabled={state.level === 4}
-              onChange={() => view.toggle("showSupports")}
-            />
-            Supports
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              checked={state.showElectrical}
-              onChange={() => view.toggle("showElectrical")}
-            />
-            Electrical
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              checked={state.screenOn}
-              onChange={() => view.toggle("screenOn")}
-            />
-            Screen artwork
-          </label>
+          {state.workspace === "assembly" && (
+            <>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={state.level < 4 && state.showSupports}
+                  disabled={state.level === 4}
+                  onChange={() => view.toggle("showSupports")}
+                />
+                Supports
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={state.showElectrical}
+                  onChange={() => view.toggle("showElectrical")}
+                />
+                Electrical
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={state.screenOn}
+                  onChange={() => view.toggle("screenOn")}
+                />
+                Screen artwork
+              </label>
+            </>
+          )}
           <label className="units-label">
             Units
             <select
@@ -99,10 +143,17 @@ export function DesignerWorkspace() {
             </select>
           </label>
         </div>
-        <FindingsPanel assembly={preview.assembly} />
+        <FindingsPanel
+          assembly={
+            state.workspace === "construction"
+              ? snapshot.assembly
+              : preview.assembly
+          }
+        />
         <footer>
-          Explore with fixed views. Hover a dimension to inspect it; choose its
-          edit button to jump to the distance.
+          {state.workspace === "construction"
+            ? "Choose a fixed construction section. Use ↗ beside a dimension to edit its source."
+            : "Explore with fixed views. Hover a dimension to inspect it; choose its edit button to jump to the distance."}
         </footer>
       </div>
       <DimensionsDrawer
