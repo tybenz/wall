@@ -30,7 +30,7 @@ export type ViewSnapshot = Readonly<{
 export function createViewController() {
   let snapshot: ViewSnapshot = Object.freeze({
     workspace: "assembly",
-    constructionView: "framing",
+    constructionView: "installation",
     preset: "front",
     mountPreset: "parked",
     level: 0,

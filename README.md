@@ -42,3 +42,5 @@ Pushes to `main` run formatting, tests and build, then upload only `dist/` to Gi
 npm run check
 npm run format:check
 ```
+
+Construction includes an installation height elevation with numbered floor-height references, part-location coordinates, per-measurement verification links, and a matching SVG download.

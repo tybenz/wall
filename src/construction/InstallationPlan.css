@@ -1,0 +1,21 @@
+.installation-plan { padding: 24px; }
+.installation-heading { display: flex; justify-content: space-between; align-items: start; gap: 20px; }
+.installation-heading h2 { margin-top: 0; }
+.installation-heading button { white-space: nowrap; }
+.installation-plan p { font-size: 12px; line-height: 1.7; color: #66765e; }
+.installation-plan .installation-summary { padding: 12px 16px; background: #f1f3ec; border-radius: 8px; }
+.installation-plan .installation-warning { color: #8b5c28; }
+.installation-figure { overflow-x: auto; }
+.installation-figure svg { display: block; width: 100%; min-width: 760px; }
+.installation-plan table { border-collapse: collapse; width: 100%; font-size: 12px; }
+.installation-plan th, .installation-plan td { padding: 12px; text-align: left; border-bottom: 1px solid #e1e6d8; vertical-align: top; }
+.installation-plan thead { background: #f1f3ec; }
+.installation-number { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.installation-number:hover { font-weight: 700; background: #f1f3ec; }
+.installation-dependencies summary { color: #946b2d; cursor: pointer; }
+.installation-dependencies button { display: block; margin-top: 6px; text-align: left; font-size: 11px; }
+.installation-known { color: #6b7b62; font-size: 11px; }
+@media (max-width: 600px) {
+  .installation-plan { padding: 14px; }
+  .installation-heading { flex-direction: column; gap: 4px; }
+}

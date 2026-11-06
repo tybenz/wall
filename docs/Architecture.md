@@ -58,3 +58,11 @@ Model, controller, persistence, projection and view-state tests exercise the pub
 `electrical` owns generic, independent per-location component facts and pure body/plate/opening placement. A box's front datum is a layout choice; physical body depth remains invariant. `SegmentIntersections` and `RouteCrossings` resolve actual in-wall segment intersections, shared by findings, section markers and the coordinate schedule. Reserved connection reach is not fabricated hardware.
 
 `ConstructionSections` resolves preset drawing primitives. `ConstructionSchedule` resolves millimeter cut / location data; SVG and CSV renderers consume it. `ConstructionDetails` only switches the fixed drawing/schedule views and triggers downloads. `UpgradeConstruction` preserves older project datums while explicitly marking inferred separate component facts provisional. `OffsetListEditor` is shared by stud offsets and available rail mounting shifts.
+
+
+Installation height planning uses `src/construction/InstallationPlan.ts`: a pure projection of the resolved
+assembly into numbered floor-height datums, part footprints and per-row physical
+fact dependencies. `InstallationPlanSvg` generates the same escaped SVG for the
+on-screen elevation and download. `InstallationPlanView` handles presentation,
+unit formatting, dependency disclosures and drawer navigation. The installation
+plan does not recalculate mount or electrical geometry.

@@ -9,7 +9,7 @@ export const constructionViews = [
   { id: "edge", label: "Panel edge" },
 ] as const;
 export type ConstructionView =
-  (typeof constructionViews)[number]["id"] | "schedule";
+  (typeof constructionViews)[number]["id"] | "schedule" | "installation";
 export type SectionRect = Readonly<{
   id: string;
   label: string;
@@ -55,7 +55,7 @@ const wood = "#c7ab83",
 export function resolveConstructionSection(
   project: Project,
   assembly: Assembly,
-  view: Exclude<ConstructionView, "schedule">,
+  view: Exclude<ConstructionView, "schedule" | "installation">,
   electricalPart: ElectricalPartId = "upperPower",
 ): ConstructionSection {
   const d = project.distances,

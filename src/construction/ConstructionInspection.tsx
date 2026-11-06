@@ -15,7 +15,7 @@ export function ConstructionInspection({
   view,
   state,
   viewId,
-}: ConstructionProps & { viewId: Exclude<ConstructionView, "schedule"> }) {
+}: ConstructionProps & { viewId: Exclude<ConstructionView, "schedule" | "installation"> }) {
   const section = useMemo(
     () =>
       resolveConstructionSection(

@@ -2,6 +2,7 @@ import { exportConstructionSvg } from "./ConstructionExport";
 import { exportConstructionScheduleCsv } from "./ConstructionSchedule";
 import { ConstructionScheduleView } from "./ConstructionScheduleView";
 import { ConstructionInspection } from "./ConstructionInspection";
+import { InstallationPlanView } from "./InstallationPlanView";
 import { constructionViews } from "./ConstructionSections";
 import type { Project } from "../designer/DesignerTypes";
 import type { Assembly } from "../geometry/AssemblyTypes";
@@ -42,6 +43,12 @@ export function ConstructionDetails(props: ConstructionProps) {
   return (
     <section className="construction-details" aria-label="Construction details">
       <div className="construction-tabs" aria-label="Construction views">
+        <button
+          aria-pressed={state.constructionView === "installation"}
+          onClick={() => view.setConstructionView("installation")}
+        >
+          Installation heights
+        </button>
         {constructionViews.filter((v) => v.id !== "electrical").map((v) => (
           <button
             key={v.id}
@@ -64,7 +71,9 @@ export function ConstructionDetails(props: ConstructionProps) {
           Export schedule CSV ↓
         </button>
       </div>
-      {state.constructionView === "schedule" ? (
+      {state.constructionView === "installation" ? (
+        <InstallationPlanView {...props} />
+      ) : state.constructionView === "schedule" ? (
         <ConstructionScheduleView {...props} />
       ) : (
         <ConstructionInspection {...props} viewId={state.constructionView} />
