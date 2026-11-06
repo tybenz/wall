@@ -29,6 +29,11 @@ export function createDesignerController(
   };
   return {
     store,
+    setMountSwivel(degrees: number) {
+      if (!Number.isFinite(degrees) || degrees < 0 || degrees > 70)
+        throw new RangeError("Swivel must be between 0 and 70 degrees.");
+      update({ ...store.getSnapshot().project, mountSwivelDegrees: degrees });
+    },
     setDistance(id: DistanceId, mm: number): void {
       const { min, max } = distanceDefinitions[id];
       if (!Number.isFinite(mm) || mm < min || mm > max)

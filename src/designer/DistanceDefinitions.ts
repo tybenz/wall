@@ -1,4 +1,10 @@
 export const distanceDefinitions = {
+  mountExtension: {
+    label: "Mount extension beyond parked",
+    group: "structure",
+    min: 0,
+    max: 1500,
+  },
   wallWidth: { label: "Wall width", group: "surfaces", min: 300, max: 10000 },
   wallHeight: {
     label: "Ceiling height at beam",

@@ -4,7 +4,8 @@ import type { Project } from "../../designer/DesignerTypes";
 import { projectPoint } from "../Projection";
 import type { ViewController, ViewSnapshot } from "../ViewStore";
 import { formatInches } from "../../shared/Units";
-import { getDimensions } from "./DimensionDefinitions";
+import { getPreviewDimensions } from "./MountDimensions";
+import type { MountPreview } from "../../geometry/MountMotion";
 import { DimensionAnnotation } from "./DimensionAnnotation";
 export function DimensionOverlay({
   project,
@@ -14,6 +15,7 @@ export function DimensionOverlay({
   height,
   view,
   state,
+  preview,
 }: {
   project: Project;
   assembly: Assembly;
@@ -22,6 +24,7 @@ export function DimensionOverlay({
   height: number;
   view: ViewController;
   state: ViewSnapshot;
+  preview: MountPreview;
 }) {
   const placed: { x: number; y: number; width: number }[] = [];
   return (
@@ -31,56 +34,58 @@ export function DimensionOverlay({
       height={height}
       aria-label="Interactive drawing dimensions"
     >
-      {getDimensions(project, assembly, state).map((dimension) => {
-        const start = projectPoint(dimension.start, camera, width, height),
-          end = projectPoint(dimension.end, camera, width, height);
-        const value =
-          state.units === "in"
-            ? formatInches(dimension.mm)
-            : `${Number(dimension.mm.toFixed(1))} mm`;
-        const label = `${dimension.label} ${value}`,
-          labelWidth = Math.max(100, label.length * 6.1 + 36);
-        const x = Math.max(
-          labelWidth / 2 + 8,
-          Math.min(
-            width - labelWidth / 2 - 8,
-            (start[0] + end[0]) / 2 + (dimension.offset?.[0] ?? 0),
-          ),
-        );
-        let y = Math.max(
-          20,
-          Math.min(
-            height - 20,
-            (start[1] + end[1]) / 2 + (dimension.offset?.[1] ?? 0),
-          ),
-        );
-        for (
-          let tries = 0;
-          tries < 12 &&
-          placed.some(
-            (item) =>
-              Math.abs(item.x - x) < (item.width + labelWidth) / 2 + 4 &&
-              Math.abs(item.y - y) < 32,
+      {getPreviewDimensions(project, assembly, state, preview).map(
+        (dimension) => {
+          const start = projectPoint(dimension.start, camera, width, height),
+            end = projectPoint(dimension.end, camera, width, height);
+          const value =
+            state.units === "in"
+              ? formatInches(dimension.mm)
+              : `${Number(dimension.mm.toFixed(1))} mm`;
+          const label = `${dimension.label} ${value}`,
+            labelWidth = Math.max(100, label.length * 6.1 + 36);
+          const x = Math.max(
+            labelWidth / 2 + 8,
+            Math.min(
+              width - labelWidth / 2 - 8,
+              (start[0] + end[0]) / 2 + (dimension.offset?.[0] ?? 0),
+            ),
           );
-          tries++
-        )
-          y = y + 34 > height - 20 ? Math.max(20, y - 68) : y + 34;
-        placed.push({ x, y, width: labelWidth });
-        return (
-          <DimensionAnnotation
-            key={dimension.id}
-            dimension={dimension}
-            start={start}
-            end={end}
-            labelPosition={[x, y]}
-            label={label}
-            active={
-              (state.hoveredField ?? state.activeField) === dimension.field
-            }
-            view={view}
-          />
-        );
-      })}
+          let y = Math.max(
+            20,
+            Math.min(
+              height - 20,
+              (start[1] + end[1]) / 2 + (dimension.offset?.[1] ?? 0),
+            ),
+          );
+          for (
+            let tries = 0;
+            tries < 12 &&
+            placed.some(
+              (item) =>
+                Math.abs(item.x - x) < (item.width + labelWidth) / 2 + 4 &&
+                Math.abs(item.y - y) < 32,
+            );
+            tries++
+          )
+            y = y + 34 > height - 20 ? Math.max(20, y - 68) : y + 34;
+          placed.push({ x, y, width: labelWidth });
+          return (
+            <DimensionAnnotation
+              key={dimension.id}
+              dimension={dimension}
+              start={start}
+              end={end}
+              labelPosition={[x, y]}
+              label={label}
+              active={
+                (state.hoveredField ?? state.activeField) === dimension.field
+              }
+              view={view}
+            />
+          );
+        },
+      )}
     </svg>
   );
 }

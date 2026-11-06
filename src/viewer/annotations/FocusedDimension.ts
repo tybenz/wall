@@ -205,6 +205,10 @@ export function getFocusedDimension(
       start = [panel.x, panel.y, panel.z];
       end = [panel.x + d.supportInset.mm, panel.y, panel.z];
       break;
+    case "mountExtension":
+      start = [tvCenter[0], tvCenter[1], tv.z];
+      end = [tvCenter[0], tvCenter[1], tv.z + d.mountExtension.mm];
+      break;
     case "mountWidth":
       [start, end] = axisDimension(mount, "width", mount.width);
       break;

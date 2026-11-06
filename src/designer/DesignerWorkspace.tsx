@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { resolveMountPreview } from "../geometry/MountMotion";
+import { MountControls } from "../viewer/MountControls";
+import { useMemo, useState } from "react";
 import { useDesignerController } from "./DesignerContext";
 import { useDesigner } from "./UseDesigner";
 import { createViewController } from "../viewer/ViewStore";
@@ -14,6 +16,15 @@ export function DesignerWorkspace() {
   const snapshot = useDesigner(controller.store);
   const [view] = useState(createViewController);
   const state = useView(view);
+  const preview = useMemo(
+    () =>
+      resolveMountPreview(
+        snapshot.project,
+        snapshot.assembly,
+        state.mountPreset,
+      ),
+    [snapshot.project, snapshot.assembly, state.mountPreset],
+  );
   return (
     <main className={`application ${state.drawerOpen ? "has-drawer" : ""}`}>
       <header className="topbar">
@@ -40,9 +51,11 @@ export function DesignerWorkspace() {
           </div>
         </div>
         <ViewControls view={view} state={state} />
+        <MountControls view={view} state={state} preview={preview} />
         <WallViewer
           project={snapshot.project}
           assembly={snapshot.assembly}
+          preview={preview}
           view={view}
           state={state}
         />
@@ -86,7 +99,7 @@ export function DesignerWorkspace() {
             </select>
           </label>
         </div>
-        <FindingsPanel assembly={snapshot.assembly} />
+        <FindingsPanel assembly={preview.assembly} />
         <footer>
           Explore with fixed views. Hover a dimension to inspect it; choose its
           edit button to jump to the distance.

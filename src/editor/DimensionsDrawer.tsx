@@ -1,4 +1,5 @@
-import { useEffect, useRef } from "react";
+import { AngleInput } from "./AngleInput";
+import { Fragment, useEffect, useRef } from "react";
 import type { DesignerController } from "../designer/DesignerController";
 import type { DesignerSnapshot } from "../designer/DesignerStore";
 import type {
@@ -134,18 +135,25 @@ export function DimensionsDrawer({
             const id = key as DistanceId;
             const input = project.distances[id];
             return (
-              <DistanceInput
-                key={id}
-                field={`distance:${id}`}
-                label={definition.label}
-                mm={input.mm}
-                note={input.note}
-                confirmed={input.confidence === "confirmed"}
-                onConfirm={(value) => controller.confirmDistance(id, value)}
-                onChange={(value) => controller.setDistance(id, value)}
-                view={view}
-                units={state.units}
-              />
+              <Fragment key={id}>
+                <DistanceInput
+                  field={`distance:${id}`}
+                  label={definition.label}
+                  mm={input.mm}
+                  note={input.note}
+                  confirmed={input.confidence === "confirmed"}
+                  onConfirm={(value) => controller.confirmDistance(id, value)}
+                  onChange={(value) => controller.setDistance(id, value)}
+                  view={view}
+                  units={state.units}
+                />
+                {id === "mountExtension" && (
+                  <AngleInput
+                    degrees={project.mountSwivelDegrees}
+                    onChange={controller.setMountSwivel}
+                  />
+                )}
+              </Fragment>
             );
           })}
         {state.group === "placement" && (

@@ -14,6 +14,7 @@ type InchRange = readonly [number, number];
 // Interaction ranges are deliberately narrower than the project's valid limits.
 // Precise text entry can expand a slider without changing the entered value.
 const distances: Record<DistanceId, InchRange> = {
+  mountExtension: [0, 36],
   wallWidth: [48, 180],
   wallHeight: [72, 144],
   wallLeftHeight: [72, 144],

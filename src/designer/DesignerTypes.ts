@@ -18,4 +18,5 @@ export type Project = Readonly<{
   products: ProductCatalog;
   studs: Readonly<{ positions: readonly number[]; confirmed: boolean }>;
   soundbarOrientation: "flat" | "vertical";
+  mountSwivelDegrees: number;
 }>;

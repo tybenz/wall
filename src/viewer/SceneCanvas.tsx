@@ -1,3 +1,4 @@
+import type { MountPreview } from "../geometry/MountMotion";
 import { Suspense } from "react";
 import { Canvas } from "@react-three/fiber";
 import type { OrthographicCamera } from "three";
@@ -10,11 +11,13 @@ export default function SceneCanvas({
   project,
   assembly,
   state,
+  preview,
 }: {
   camera: OrthographicCamera;
   project: Project;
   assembly: Assembly;
   state: ViewSnapshot;
+  preview: MountPreview;
 }) {
   return (
     <Canvas
@@ -50,7 +53,12 @@ export default function SceneCanvas({
       />
       <directionalLight position={[4000, 1000, 2000]} intensity={0.6} />
       <Suspense fallback={null}>
-        <AssemblyDrawing project={project} assembly={assembly} state={state} />
+        <AssemblyDrawing
+          project={project}
+          assembly={assembly}
+          state={state}
+          preview={preview}
+        />
       </Suspense>
     </Canvas>
   );

@@ -41,6 +41,10 @@ TV, soundbar and panel track TV center height. The TV and console stay centered 
 
 A fitted orthographic camera provides front, right-side and equal-axis isometric projections. There are no mouse camera or drag-placement controls. The same camera instance drives canvas and annotations. Inspection hides TV/soundbar/cradle and the console, then panel and bracket, slats, then drywall. The console is shown only in Finished; no separate console toggle is needed. Perimeter and mount spacers are visible behind the panel, with lag guides through the depth stack. View state does not alter project data or persist with project saves.
 
+## Mount position previews
+
+`MountMotion` resolves the parked assembly into a selected fixed mount pose without changing project geometry. Its rigid transform drives both `MotionGroup` and pose-specific annotations. Rotated envelopes fit the camera; oriented collision checks avoid false positives from empty corners of axis-aligned envelopes. Fixed objects retain their parked coordinates. Extension and swivel limits persist in the project; the selected pose stays in the view store. See [V2](V2.md) for the first slice and its limits.
+
 ## Verification
 
 Model, controller, persistence, projection and view-state tests exercise the public interfaces. Browser checks cover rendering, camera/layer selection, dimension-to-input focus and local save/load. Visual refinements are expected during user testing. Keep future changes localized to these modules rather than adding rules to the workspace root.

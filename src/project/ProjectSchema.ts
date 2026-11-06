@@ -89,6 +89,7 @@ export const projectSchema = z
           ...current
         } = original;
         return {
+          mountExtension: defaults.mountExtension,
           cradleThickness: defaults.cradleThickness,
           upperBoxGap: defaults.upperBoxGap,
           supportSpacing: defaults.supportSpacing,
@@ -142,6 +143,7 @@ export const projectSchema = z
       })
       .strict(),
     soundbarOrientation: z.enum(["flat", "vertical"]),
+    mountSwivelDegrees: z.number().finite().min(0).max(70).default(30),
   })
   .strict();
 export function parseProject(value: unknown): Project {

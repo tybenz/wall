@@ -1,8 +1,10 @@
+import type { MountPreset } from "../geometry/MountMotion";
 import type { FieldId } from "../designer/DesignerTypes";
 import type { EditorGroup } from "../designer/DistanceDefinitions";
 export type CameraPreset = "front" | "side" | "isometric";
 export type ViewSnapshot = Readonly<{
   preset: CameraPreset;
+  mountPreset: MountPreset;
   level: number;
   zoom: number;
   dimensions: boolean;
@@ -22,6 +24,7 @@ export type ViewSnapshot = Readonly<{
 export function createViewController() {
   let snapshot: ViewSnapshot = Object.freeze({
     preset: "front",
+    mountPreset: "parked",
     level: 0,
     zoom: 1,
     dimensions: true,
@@ -54,6 +57,7 @@ export function createViewController() {
   };
   return {
     store,
+    setMountPreset: (mountPreset: MountPreset) => update({ mountPreset }),
     setPreset: (preset: CameraPreset) => update({ preset }),
     setLevel: (level: number) =>
       update({ level: Math.max(0, Math.min(4, level)) }),

@@ -1,3 +1,4 @@
+import type { MountPreview } from "../geometry/MountMotion";
 import { Component, Suspense, lazy, useMemo, type ReactNode } from "react";
 import type { Assembly } from "../geometry/AssemblyTypes";
 import type { Project } from "../designer/DesignerTypes";
@@ -30,16 +31,25 @@ export function WallViewer({
   assembly,
   view,
   state,
+  preview,
 }: {
   project: Project;
   assembly: Assembly;
   view: ViewController;
   state: ViewSnapshot;
+  preview: MountPreview;
 }) {
   const { ref, width, height } = useElementSize();
   const camera = useMemo(
-    () => createCamera(assembly, width, height, state.preset, state.zoom),
-    [assembly, width, height, state.preset, state.zoom],
+    () =>
+      createCamera(
+        state.level < 2 ? preview.assembly : assembly,
+        width,
+        height,
+        state.preset,
+        state.zoom,
+      ),
+    [preview, assembly, width, height, state.preset, state.zoom, state.level],
   );
   return (
     <div
@@ -58,6 +68,7 @@ export function WallViewer({
             project={project}
             assembly={assembly}
             state={state}
+            preview={preview}
           />
         </Suspense>
       </RenderBoundary>
@@ -70,6 +81,7 @@ export function WallViewer({
           height={height}
           view={view}
           state={state}
+          preview={preview}
         />
       )}
       <div className="viewport-caption">

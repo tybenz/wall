@@ -22,7 +22,12 @@ export function createInitialProject(): Project {
     products: structuredClone(productCatalog),
     studs: { positions: [8, 24, 40, 56, 72, 88].map(inches), confirmed: false },
     soundbarOrientation: "flat",
+    mountSwivelDegrees: 30,
     distances: {
+      mountExtension: preference(
+        18,
+        "Additional TV-rear travel from the parked position. Provisional preview range, not verified mount reach.",
+      ),
       soundbarOffsetZ: preference(
         3,
         "Provisional forward offset avoids panel interference; verify cradle reach.",

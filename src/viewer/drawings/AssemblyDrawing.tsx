@@ -1,3 +1,5 @@
+import type { MountPreview } from "../../geometry/MountMotion";
+import { MotionGroup } from "./MotionGroup";
 import type { Assembly } from "../../geometry/AssemblyTypes";
 import { getPart } from "../../geometry/AssemblyTypes";
 import type { Project } from "../../designer/DesignerTypes";
@@ -14,10 +16,12 @@ export function AssemblyDrawing({
   assembly,
   project,
   state,
+  preview,
 }: {
   assembly: Assembly;
   project: Project;
   state: ViewSnapshot;
+  preview: MountPreview;
 }) {
   const p = project.products,
     d = project.distances;
@@ -49,9 +53,11 @@ export function AssemblyDrawing({
           color={p.featurePanel.appearance.color}
         />
       )}
-      {state.level < 2 && <MountAssembly assembly={assembly} />}
+      {state.level < 2 && (
+        <MountAssembly assembly={assembly} preview={preview} />
+      )}
       {state.level === 0 && (
-        <>
+        <MotionGroup transform={preview.transform}>
           <Television
             bounds={getPart(assembly, "tv").bounds}
             screenOn={state.screenOn}
@@ -69,7 +75,7 @@ export function AssemblyDrawing({
             bounds={getPart(assembly, "soundbar").bounds}
             color={p.soundbar.appearance.color}
           />
-        </>
+        </MotionGroup>
       )}
       {state.level === 0 && (
         <MediaConsole

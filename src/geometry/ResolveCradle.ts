@@ -11,7 +11,11 @@ export function resolveCradle(
   const front = bar.z + bar.depth + thickness;
   const bottom = bar.y - thickness;
   const armWidth = Math.min(32, bar.width / 8);
-  const top = Math.max(tv.y + Math.min(100, tv.height / 4), bottom + thickness);
+  const top = Math.max(
+    mount.y + mount.height / 2,
+    tv.y + Math.min(100, tv.height / 4),
+    bottom + thickness,
+  );
   const centers = [0.25, 0.75].map(
     (fraction) => mount.x + mount.width * fraction,
   );
