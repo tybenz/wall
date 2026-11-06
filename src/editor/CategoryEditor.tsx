@@ -1,3 +1,7 @@
+import { ElectricalPlanner } from "./ElectricalPlanner";
+import { RailPositionEditor } from "./RailPositionEditor";
+import { BlockingPlanControls } from "./BlockingPlanControls";
+import { MountHeightChain } from "./MountHeightChain";
 import type { EditorGroup } from "../designer/DistanceDefinitions";
 import { fieldGroup, productGroups } from "../designer/FieldCatalog";
 import type { ProductId } from "../designer/DesignerTypes";
@@ -19,11 +23,15 @@ export function CategoryEditor(
   const productId = (Object.keys(productGroups) as ProductId[]).find(
     (id) => productGroups[id] === group,
   );
+  if (group === "electrical") return <ElectricalPlanner {...props} />;
   return (
     <>
       {editorSections(group).map((section) => (
         <section className="editor-section" key={section.label}>
           <h3>{section.label}</h3>
+          {group === "wall" && section.label === "Blocking plan" && (
+            <BlockingPlanControls {...props} />
+          )}
           {section.label === "Layout" && productId && (
             <label className="category-finish">
               Finish
@@ -66,20 +74,41 @@ export function CategoryEditor(
               Unverified dimensions still need checking.
             </p>
           )}
-          {section.fields.map((field) =>
-            field === "studs" ? (
-              <StudEditor
-                key={`studs:${state.units}`}
-                project={project}
-                controller={controller}
-                units={state.units}
-                editRequest={
-                  state.focusField === "studs" ? state.focusRequest : 0
-                }
-              />
-            ) : (
-              <FieldEditor key={field} {...props} field={field} />
-            ),
+          {section.fields
+            .filter(
+              (field) =>
+                !(
+                  field === "distance:blockingBottom" &&
+                  project.blockingPlacement === "follow-mount"
+                ) &&
+                (!field.startsWith("electrical:") ||
+                  field.split(":")[1] === state.electricalPart),
+            )
+            .map((field) =>
+              field === "railPositions" ? (
+                <RailPositionEditor key="railPositions" {...props} />
+              ) : field === "studs" ? (
+                <StudEditor
+                  key={`studs:${state.units}`}
+                  project={project}
+                  controller={controller}
+                  units={state.units}
+                  editRequest={
+                    state.focusField === "studs" ? state.focusRequest : 0
+                  }
+                />
+              ) : (
+                <FieldEditor key={field} {...props} field={field} />
+              ),
+            )}
+          {group === "tv" && section.label === "Layout" && (
+            <MountHeightChain
+              assembly={assembly}
+              state={state}
+              view={view}
+              project={project}
+              controller={controller}
+            />
           )}
           {section.label === "Position previews" && (
             <>

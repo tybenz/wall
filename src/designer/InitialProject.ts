@@ -1,3 +1,7 @@
+import {
+  createElectricalParts,
+  initialElectricalMounting,
+} from "../electrical/ElectricalTypes";
 import { distanceDefinitions, type DistanceId } from "./DistanceDefinitions";
 import { productCatalog } from "../products/ProductCatalog";
 import { inches } from "../shared/Units";
@@ -19,12 +23,78 @@ const measurement = (value: number, note: string): DistanceInput => ({
 export function createInitialProject(): Project {
   const project: Project = {
     schemaVersion: 2,
+    upperElectricalPlacement: "below",
+    blockingPlacement: "follow-mount",
+    mountRailOffsets: {
+      positions: [-25.4, -12.7, 0, 12.7, 25.4],
+      confirmed: false,
+    },
+    selectedRailPosition: 2,
+    electricalParts: createElectricalParts(),
+    electricalMounting: { ...initialElectricalMounting },
     name: "TV feature wall",
     products: structuredClone(productCatalog),
     studs: { positions: [8, 24, 40, 56, 72, 88].map(inches), confirmed: false },
     soundbarOrientation: "flat",
     mountSwivelDegrees: 30,
     distances: {
+      tvTopToMountHole: measurement(
+        14,
+        "Unmeasured TV top to upper mounting-hole center. Fixed to the selected TV body.",
+      ),
+      railReferenceHoleBelowHook: measurement(
+        2,
+        "Unmeasured hook-to-hole offset for the reference rail setting, positive down from hook to upper TV bolt.",
+      ),
+      railAboveHook: measurement(
+        2,
+        "Unmeasured rail projection above its hook contact line.",
+      ),
+      railBelowHook: measurement(
+        15,
+        "Unmeasured rail projection below its hook contact line.",
+      ),
+      tvMountHoleSpacingX: measurement(
+        400 / 25.4,
+        "Unmeasured horizontal TV mounting-hole spacing.",
+      ),
+      tvMountHoleSpacingY: measurement(
+        200 / 25.4,
+        "Unmeasured vertical TV mounting-hole spacing.",
+      ),
+      hookAbovePlateTop: measurement(
+        2,
+        "Unmeasured assembled-mount offset: positive means wall plate top is below the TV hook contact line; negative means above. Measure in the parked, level configuration.",
+      ),
+      lagTopRowInset: measurement(
+        2.25,
+        "Unmeasured hole position, measured downward from wall plate top.",
+      ),
+      lagBottomRowInset: measurement(
+        6.75,
+        "Unmeasured hole position, measured downward from wall plate top.",
+      ),
+      lagColumnSpacing: measurement(
+        16,
+        "Unmeasured horizontal hole-column spacing. Independent of chosen spacer positions.",
+      ),
+      lagPatternOffsetX: measurement(
+        0,
+        "Assumed centered hole pattern; enter measured horizontal offset if asymmetric.",
+      ),
+      mountPlateThickness: measurement(
+        0.2362204724409449,
+        "Unmeasured plate thickness, used in the proposed fastener path.",
+      ),
+      blockingLagMargin: preference(
+        1.5,
+        "Chosen planning allowance above and below lag rows; not a structural edge-distance requirement.",
+      ),
+      electricalPlateGap: preference(
+        0.5,
+        "Chosen clear gap between adjacent plate edges; each pair stays centered on its mount/wall datum.",
+      ),
+
       studWidth: measurement(
         1.5,
         "Assumed stud face width; verify actual framing stock.",
@@ -36,30 +106,6 @@ export function createInitialProject(): Project {
       lagEmbedment: measurement(
         1.75,
         "Proposed embedment from blocking front face; not a fastener specification.",
-      ),
-      lagRowSpacing: measurement(
-        4.5,
-        "Illustrative vertical hole spacing, centered on the mount plate. Measure actual holes.",
-      ),
-      plateWidth: measurement(
-        5.905511811023622,
-        "Unmeasured combined power / low-voltage plate envelope.",
-      ),
-      plateHeight: measurement(
-        5.118110236220473,
-        "Unmeasured combined plate height; upper plate top tracks the bracket gap.",
-      ),
-      boxWidth: measurement(
-        5.118110236220473,
-        "Unmeasured combined box / rough-opening envelope. Separate compartments remain schematic.",
-      ),
-      boxHeight: measurement(
-        4.330708661417323,
-        "Unmeasured rough-opening height, centered behind the plate group.",
-      ),
-      boxDepth: measurement(
-        2.25,
-        "Depth behind the back of drywall; the box extends forward to the finished surface.",
       ),
       routeDepth: measurement(
         1.25,
@@ -107,10 +153,6 @@ export function createInitialProject(): Project {
         "Unmeasured wall plate placeholder; no bolt pattern is inferred.",
       ),
       mountHeight: measurement(9, "Unmeasured wall plate placeholder."),
-      mountOffsetY: measurement(
-        -2,
-        "Unmeasured mount datum; not a VESA offset or bolt schedule.",
-      ),
       blockingBottom: preference(
         45,
         "Placeholder blocking position, not structural approval.",

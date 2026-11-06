@@ -76,7 +76,9 @@ describe("construction geometry", () => {
     }
     // The flat panel is continuous at the mount; its only cutout is for plates.
     expect(getPart(assembly, "featurePanel").openings).toEqual([
-      assembly.construction.boxes[0],
+      ...assembly.construction.electrical
+        .filter((p) => p.location === "upper")
+        .map((p) => p.opening),
     ]);
   });
   it("centers plates on the mount and keeps a two-inch edge gap as the layout changes", () => {
@@ -85,13 +87,16 @@ describe("construction geometry", () => {
       ["wallWidth", inches(110)],
       ["tvCenterHeight", inches(57)],
       ["mountHeight", inches(11)],
-      ["mountOffsetY", inches(-3)],
+      ["hookAbovePlateTop", inches(-3)],
     ] as const) {
       controller.setDistance(id, value);
       const assembly = controller.store.getSnapshot().assembly;
       const mount = getPart(assembly, "mount").bounds;
       const plate = assembly.construction.plates[0];
-      expect(plate.x + plate.width / 2).toBeCloseTo(mount.x + mount.width / 2);
+      const right = assembly.construction.plates[1];
+      expect((plate.x + right.x + right.width) / 2).toBeCloseTo(
+        mount.x + mount.width / 2,
+      );
       expect(mount.y - plate.y - plate.height).toBeCloseTo(inches(2));
       expect(plate.z).toBeCloseTo(assembly.depth.panelFront);
     }
@@ -104,7 +109,10 @@ describe("construction geometry", () => {
   });
   it("detects an electrical box placed over a stud", () => {
     const controller = createDesignerController(createInitialProject());
-    controller.setDistance("electricalOffsetX", inches(56) - inches(103) / 2);
+    controller.setDistance(
+      "electricalOffsetX",
+      inches(56 + 2) - inches(103) / 2,
+    );
     expect(
       controller.store
         .getSnapshot()
@@ -113,12 +121,12 @@ describe("construction geometry", () => {
   });
   it("permits signed design offsets while rejecting invalid physical lengths", () => {
     const controller = createDesignerController(createInitialProject());
-    controller.setDistance("mountOffsetY", -100);
+    controller.setDistance("hookAbovePlateTop", -100);
     const assembly = controller.store.getSnapshot().assembly;
     expect(
       getPart(assembly, "mount").bounds.y +
-        getPart(assembly, "mount").bounds.height / 2,
-    ).toBeCloseTo(inches(52) - 100);
+        getPart(assembly, "mount").bounds.height,
+    ).toBeCloseTo(assembly.construction.datums.hook + 100);
     expect(() => controller.setProductDimension("tv", "depth", 0)).toThrow();
     expect(() => controller.setStuds([NaN], false)).toThrow();
   });

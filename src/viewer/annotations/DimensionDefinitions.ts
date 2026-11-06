@@ -192,10 +192,17 @@ export function getDimensions(
     result.push({
       id: "blocking-height",
       label: "Blocking bottom",
-      mm: d.blockingBottom.mm,
+      mm: assembly.construction.datums.blockingBottom,
       start: [0, 0, -d.drywallThickness.mm],
-      end: [0, d.blockingBottom.mm, -d.drywallThickness.mm],
-      field: "distance:blockingBottom",
+      end: [
+        0,
+        assembly.construction.datums.blockingBottom,
+        -d.drywallThickness.mm,
+      ],
+      field:
+        project.blockingPlacement === "follow-mount"
+          ? "distance:blockingHeight"
+          : "distance:blockingBottom",
 
       offset: [-70, 0],
     });

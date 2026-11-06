@@ -1,3 +1,8 @@
+import {
+  electricalDimensions,
+  type ElectricalPartId,
+  type ElectricalDimensionId,
+} from "../../electrical/ElectricalTypes";
 import type { Assembly, Bounds } from "../../geometry/AssemblyTypes";
 import { getPart } from "../../geometry/AssemblyTypes";
 import type {
@@ -27,7 +32,7 @@ export function getFocusedDimension(
     b.y + b.height / 2,
     b.z + b.depth,
   ];
-  if (field === "studs") return null;
+  if (field === "studs" || field === "railPositions") return null;
   const axisDimension = (
     b: Bounds,
     axis: ProductAxis,
@@ -47,6 +52,35 @@ export function getFocusedDimension(
             [b.x, b.y + b.height / 2, b.z],
             [b.x, b.y + b.height / 2, b.z + mm],
           ];
+  if (field.startsWith("electrical:")) {
+    const [, id, dimension] = field.split(":") as [
+      "electrical",
+      ElectricalPartId,
+      ElectricalDimensionId,
+    ];
+    const device = assembly.construction.electrical.find((p) => p.id === id)!;
+    const b = dimension.startsWith("plate")
+      ? device.plate
+      : dimension.startsWith("body")
+        ? device.body
+        : device.opening;
+    const axis = dimension.endsWith("Width")
+      ? "width"
+      : dimension.endsWith("Height")
+        ? "height"
+        : "depth";
+    const mm = project.electricalParts[id][dimension].mm,
+      [start, end] = axisDimension(b, axis, mm);
+    return {
+      id: field,
+      label: `${device.label}: ${electricalDimensions[dimension]}`,
+      mm,
+      start,
+      end,
+      field,
+      offset: [40, -30],
+    };
+  }
   if (field.startsWith("product:")) {
     const [, key, axis] = field.split(":") as [
       "product",
@@ -88,6 +122,79 @@ export function getFocusedDimension(
   const upper = assembly.construction.plates[0],
     boxCenter = center(upper);
   switch (id) {
+    case "tvTopToMountHole":
+      start = [tvCenter[0], assembly.construction.datums.tvTop, tv.z];
+      end = [start[0], assembly.construction.datums.upperTvHole, tv.z];
+      break;
+    case "railReferenceHoleBelowHook":
+      start = [tvCenter[0], assembly.construction.datums.hook, tv.z];
+      end = [start[0], start[1] - d[id].mm, tv.z];
+      break;
+    case "railAboveHook":
+    case "railBelowHook":
+      start = [tvCenter[0], assembly.construction.datums.hook, tv.z];
+      end = [
+        start[0],
+        start[1] + (id === "railAboveHook" ? 1 : -1) * d[id].mm,
+        tv.z,
+      ];
+      break;
+    case "hookAbovePlateTop":
+      start = [tvCenter[0], assembly.construction.datums.hook, mount.z];
+      end = [start[0], assembly.construction.datums.plateTop, mount.z];
+      break;
+    case "lagTopRowInset":
+    case "lagBottomRowInset":
+      start = [
+        mount.x + mount.width / 2,
+        assembly.construction.datums.plateTop,
+        mount.z,
+      ];
+      end = [start[0], start[1] - d[id].mm, start[2]];
+      break;
+    case "lagColumnSpacing":
+      start = assembly.construction.lagPaths[0].start;
+      end = assembly.construction.lagPaths[2].start;
+      break;
+    case "lagPatternOffsetX":
+      start = [
+        mount.x + mount.width / 2,
+        assembly.construction.datums.lagHigh,
+        mount.z,
+      ];
+      end = [start[0] + d[id].mm, start[1], start[2]];
+      break;
+    case "tvMountHoleSpacingX":
+      start = [
+        tvCenter[0] - d[id].mm / 2,
+        assembly.construction.datums.upperTvHole,
+        tv.z,
+      ];
+      end = [start[0] + d[id].mm, start[1], start[2]];
+      break;
+    case "tvMountHoleSpacingY":
+      start = [tvCenter[0], assembly.construction.datums.upperTvHole, tv.z];
+      end = [start[0], start[1] - d[id].mm, start[2]];
+      break;
+    case "mountPlateThickness":
+      start = [mount.x, mount.y, mount.z];
+      end = [start[0], start[1], start[2] + d[id].mm];
+      break;
+    case "blockingLagMargin":
+      start = [
+        tvCenter[0],
+        assembly.construction.datums.lagLow,
+        -d.drywallThickness.mm,
+      ];
+      end = [start[0], start[1] - d[id].mm, start[2]];
+      break;
+    case "electricalPlateGap": {
+      const a = assembly.construction.electrical[0].plate,
+        b = assembly.construction.electrical[1].plate;
+      start = [a.x + a.width, a.y + a.height, a.z];
+      end = [b.x, start[1], start[2]];
+      break;
+    }
     case "studWidth": {
       const b = assembly.construction.studs[0];
       if (!b) return null;
@@ -98,36 +205,11 @@ export function getFocusedDimension(
     case "lagEmbedment":
       start = [
         tvCenter[0],
-        d.blockingBottom.mm + d.blockingHeight.mm / 2,
+        assembly.construction.datums.blockingBottom + d.blockingHeight.mm / 2,
         -d.drywallThickness.mm,
       ];
       end = [start[0], start[1], start[2] - d[id].mm];
       break;
-    case "lagRowSpacing": {
-      const lag = assembly.construction.lagPaths;
-      start = lag[0].start;
-      end = lag[1].start;
-      break;
-    }
-    case "plateWidth":
-    case "plateHeight":
-      [start, end] = axisDimension(
-        upper,
-        id === "plateWidth" ? "width" : "height",
-        d[id].mm,
-      );
-      break;
-    case "boxWidth":
-    case "boxHeight": {
-      const box = assembly.construction.boxes[0];
-      [start, end] = axisDimension(
-        box,
-        id === "boxWidth" ? "width" : "height",
-        d[id].mm,
-      );
-      break;
-    }
-    case "boxDepth":
     case "routeDepth":
       start = [boxCenter[0], boxCenter[1], -d.drywallThickness.mm];
       end = [start[0], start[1], start[2] - d[id].mm];
@@ -269,24 +351,28 @@ export function getFocusedDimension(
     case "mountHeight":
       [start, end] = axisDimension(mount, "height", mount.height);
       break;
-    case "mountOffsetY":
-      start = [tvCenter[0], tvCenter[1], mount.z];
-      end = [tvCenter[0], tvCenter[1] + d.mountOffsetY.mm, mount.z];
-      break;
     case "blockingBottom":
       start = [tvCenter[0], 0, -d.drywallThickness.mm];
-      end = [tvCenter[0], d.blockingBottom.mm, -d.drywallThickness.mm];
+      end = [
+        tvCenter[0],
+        assembly.construction.datums.blockingBottom,
+        -d.drywallThickness.mm,
+      ];
       break;
     case "blockingWidth":
       start = [
         tvCenter[0] - d.blockingWidth.mm / 2,
-        d.blockingBottom.mm,
+        assembly.construction.datums.blockingBottom,
         -d.drywallThickness.mm,
       ];
       end = [start[0] + d.blockingWidth.mm, start[1], start[2]];
       break;
     case "blockingHeight":
-      start = [tvCenter[0], d.blockingBottom.mm, -d.drywallThickness.mm];
+      start = [
+        tvCenter[0],
+        assembly.construction.datums.blockingBottom,
+        -d.drywallThickness.mm,
+      ];
       end = [start[0], start[1] + d.blockingHeight.mm, start[2]];
       break;
     case "electricalOffsetX":
@@ -294,8 +380,8 @@ export function getFocusedDimension(
       end = [start[0] + d.electricalOffsetX.mm, start[1], 0];
       break;
     case "upperBoxGap":
-      start = [boxCenter[0], upper.y + upper.height, 0];
-      end = [boxCenter[0], mount.y, 0];
+      start = [boxCenter[0], project.upperElectricalPlacement === "above" ? mount.y + mount.height : upper.y + upper.height, 0];
+      end = [boxCenter[0], project.upperElectricalPlacement === "above" ? upper.y : mount.y, 0];
       break;
     case "lowerBoxHeight":
       start = [boxCenter[0], 0, 0];
@@ -305,10 +391,16 @@ export function getFocusedDimension(
   return {
     id: field,
     label: distanceDefinitions[id].label,
-    mm: d[id].mm,
+    mm:
+      id === "blockingBottom"
+        ? assembly.construction.datums.blockingBottom
+        : d[id].mm,
     start,
     end,
-    field,
+    field:
+      id === "blockingBottom" && project.blockingPlacement === "follow-mount"
+        ? "distance:blockingHeight"
+        : field,
 
     offset: [-45, -32],
   };

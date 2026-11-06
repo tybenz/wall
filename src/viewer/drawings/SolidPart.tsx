@@ -1,11 +1,13 @@
 import { RoundedBox } from "./RoundedBox";
 import type { Bounds } from "../../geometry/AssemblyTypes";
 export function SolidPart({
+  opacity = 1,
   bounds,
   color,
   radius = 0,
   roughness = 0.7,
 }: {
+  opacity?: number;
   bounds: Bounds;
   color: string;
   radius?: number;
@@ -27,13 +29,25 @@ export function SolidPart({
         castShadow
         receiveShadow
       >
-        <meshStandardMaterial color={color} roughness={roughness} />
+        <meshStandardMaterial
+          color={color}
+          roughness={roughness}
+          opacity={opacity}
+          transparent={opacity < 1}
+          depthWrite={opacity === 1}
+        />
       </RoundedBox>
     );
   return (
     <mesh position={position} castShadow receiveShadow>
       <boxGeometry args={[b.width, b.height, b.depth]} />
-      <meshStandardMaterial color={color} roughness={roughness} />
+      <meshStandardMaterial
+        color={color}
+        roughness={roughness}
+        opacity={opacity}
+        transparent={opacity < 1}
+        depthWrite={opacity === 1}
+      />
     </mesh>
   );
 }

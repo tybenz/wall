@@ -1,3 +1,8 @@
+import {
+  electricalDimensions,
+  type ElectricalPartId,
+  type ElectricalDimensionId,
+} from "../electrical/ElectricalTypes";
 import type { DesignerController } from "../designer/DesignerController";
 import type {
   Project,
@@ -22,13 +27,35 @@ export function FieldEditor({
   controller,
   view,
   state,
-}: EditorProps & { field: Exclude<FieldId, "studs"> }) {
+}: EditorProps & { field: Exclude<FieldId, "studs" | "railPositions"> }) {
   const common = {
     field,
     view,
     units: state.units,
     editRequest: state.focusField === field ? state.focusRequest : 0,
   };
+  if (field.startsWith("electrical:")) {
+    const [, id, dimension] = field.split(":") as [
+      "electrical",
+      ElectricalPartId,
+      ElectricalDimensionId,
+    ];
+    const value = project.electricalParts[id][dimension];
+    return (
+      <DistanceInput
+        {...common}
+        mode="fact"
+        label={electricalDimensions[dimension]}
+        mm={value.mm}
+        note={value.evidence.note}
+        confirmed={value.confidence === "confirmed"}
+        onConfirm={(confirmed) =>
+          controller.confirmElectricalDimension(id, dimension, confirmed)
+        }
+        onChange={(mm) => controller.setElectricalDimension(id, dimension, mm)}
+      />
+    );
+  }
   if (field.startsWith("distance:")) {
     const id = field.slice(9) as DistanceId,
       def = distanceDefinitions[id],

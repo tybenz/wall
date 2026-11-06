@@ -106,6 +106,7 @@ export function resolveMountPreview(
     getPart(base, "tv").bounds,
     getPart(base, "soundbar").bounds,
     ...base.construction.cradle,
+    ...base.construction.rails,
   ];
   const corners = moving.flatMap((b) =>
     boundsCorners(b).map((p) => movePoint(p, transform)),
@@ -153,7 +154,7 @@ export function resolveMountPreview(
   const start: Point = [
     mount.x + mount.width / 2,
     mount.y + mount.height / 2,
-    mount.z + 6,
+    mount.z + project.distances.mountPlateThickness.mm,
   ];
   const end = movePoint([transform.pivot[0], start[1], tv.z - 3], transform);
   // Four-arm diamond illustration. Length is inferred from the configured

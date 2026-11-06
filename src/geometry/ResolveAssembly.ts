@@ -1,3 +1,4 @@
+import { resolveMountDatums } from "./MountDatums";
 import { constructionFindings } from "./ConstructionFindings";
 import { resolveCradle } from "./ResolveCradle";
 import { resolveWallProfile, profileCutHeight } from "./WallProfile";
@@ -35,9 +36,10 @@ export function resolveAssembly(project: Project): Assembly {
     height: d.panelHeight.mm,
     depth: p.featurePanel.depth.mm,
   };
+  const datums = resolveMountDatums(project);
   const mount = {
     x: cx - d.mountWidth.mm / 2,
-    y: cy + d.mountOffsetY.mm - d.mountHeight.mm / 2,
+    y: datums.plateBottom,
     z: panelFront,
     width: d.mountWidth.mm,
     height: d.mountHeight.mm,
@@ -74,6 +76,7 @@ export function resolveAssembly(project: Project): Assembly {
         depth: d.drywallThickness.mm,
       }),
       topProfile: wallProfile,
+      openings: construction.openings,
     },
     {
       ...part("slats", "Fluted wall finish", {
@@ -85,11 +88,13 @@ export function resolveAssembly(project: Project): Assembly {
         depth: p.slats.depth.mm,
       }),
       topProfile: wallProfile,
-      openings: [...construction.supports, ...construction.boxes],
+      openings: [...construction.supports, ...construction.openings],
     },
     {
       ...part("featurePanel", "White feature panel", panel),
-      openings: [construction.boxes[0]],
+      openings: construction.electrical
+        .filter((p) => p.location === "upper")
+        .map((p) => p.opening),
     },
     part("tv", "TV envelope", {
       x: cx - p.tv.width.mm / 2,
@@ -288,7 +293,7 @@ export function resolveAssembly(project: Project): Assembly {
       code: "unmeasured-studs",
       severity: "info",
       message:
-        "Stud positions are provisional. Enter measured offsets from the left wall edge in Structure.",
+        "Stud positions are provisional. Enter measured offsets from the left wall edge in Wall & framing.",
     });
   findings.push(...constructionFindings(project, resolvedConstruction));
   return {

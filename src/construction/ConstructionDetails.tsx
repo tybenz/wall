@@ -1,54 +1,48 @@
-import { fieldGroup } from "../designer/FieldCatalog";
 import { exportConstructionSvg } from "./ConstructionExport";
-import { useMemo } from "react";
-import type { Project, FieldId } from "../designer/DesignerTypes";
+import { exportConstructionScheduleCsv } from "./ConstructionSchedule";
+import { ConstructionScheduleView } from "./ConstructionScheduleView";
+import { ConstructionInspection } from "./ConstructionInspection";
+import { constructionViews } from "./ConstructionSections";
+import type { Project } from "../designer/DesignerTypes";
 import type { Assembly } from "../geometry/AssemblyTypes";
 import type { ViewController, ViewSnapshot } from "../viewer/ViewStore";
-import { formatInches } from "../shared/Units";
-import {
-  constructionViews,
-  resolveConstructionSection,
-} from "./ConstructionSections";
-import { SectionDrawing } from "./SectionDrawing";
 import "./ConstructionDetails.css";
-export function ConstructionDetails({
-  project,
-  assembly,
-  view,
-  state,
-}: {
+export type ConstructionProps = {
   project: Project;
   assembly: Assembly;
   view: ViewController;
   state: ViewSnapshot;
-}) {
-  const section = useMemo(
-    () => resolveConstructionSection(project, assembly, state.constructionView),
-    [project, assembly, state.constructionView],
-  );
-  const edit = (field: FieldId) => view.openEditor(fieldGroup(field), field);
-  const exportSheet = () => {
+};
+export function ConstructionDetails(props: ConstructionProps) {
+  const { project, assembly, view, state } = props;
+  const download = (format: "svg" | "csv") => {
+    const contents =
+      format === "svg"
+        ? exportConstructionSvg(project, state.units)
+        : exportConstructionScheduleCsv(project, assembly, state.units);
     const url = URL.createObjectURL(
-      new Blob([exportConstructionSvg(project, state.units)], {
-        type: "image/svg+xml",
+      new Blob([contents], {
+        type: format === "svg" ? "image/svg+xml" : "text/csv;charset=utf-8",
       }),
     );
     const link = document.createElement("a");
     link.href = url;
-    link.download = "WallConstruction.svg";
+    link.download =
+      format === "svg"
+        ? "WallConstruction.svg"
+        : "WallConstructionSchedule.csv";
     link.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
     view.notify(
-      "Construction sheet exported with all four views and unresolved measurements.",
+      format === "svg"
+        ? "Construction views, schedule and unresolved measurements exported."
+        : "Construction schedule exported.",
     );
   };
   return (
     <section className="construction-details" aria-label="Construction details">
       <div className="construction-tabs" aria-label="Construction views">
-        <button className="construction-export" onClick={exportSheet}>
-          Export construction sheet ↓
-        </button>
-        {constructionViews.map((v) => (
+        {constructionViews.filter((v) => v.id !== "electrical").map((v) => (
           <button
             key={v.id}
             aria-pressed={state.constructionView === v.id}
@@ -57,58 +51,24 @@ export function ConstructionDetails({
             {v.label}
           </button>
         ))}
-      </div>
-      <div className="construction-heading">
-        <div>
-          <h2>{section.title}</h2>
-          <p>{section.description}</p>
-        </div>
         <button
-          onClick={() =>
-            edit(
-              state.constructionView === "electrical"
-                ? "distance:boxDepth"
-                : "studs",
-            )
-          }
+          aria-pressed={state.constructionView === "schedule"}
+          onClick={() => view.setConstructionView("schedule")}
         >
-          {state.constructionView === "electrical"
-            ? "Edit electrical"
-            : "Edit framing"}{" "}
-          ↗
+          Cut & drilling schedule
+        </button>
+        <button className="construction-export" onClick={() => download("svg")}>
+          Export sheet ↓
+        </button>
+        <button className="construction-export" onClick={() => download("csv")}>
+          Export schedule CSV ↓
         </button>
       </div>
-      <div className="construction-body">
-        <SectionDrawing section={section} units={state.units} />
-        <div className="construction-schedule">
-          <h3>Construction dimensions</h3>
-          <p>↗ opens the matching drawer input.</p>
-          <dl>
-            {section.measures.map((m, i) => (
-              <div key={`${m.label}-${i}`}>
-                <dt>{m.label}</dt>
-                <dd>
-                  {state.units === "in"
-                    ? formatInches(m.mm)
-                    : `${Number(m.mm.toFixed(1))} mm`}
-                  {m.field && (
-                    <button
-                      aria-label={`Edit ${m.label}`}
-                      onClick={() => edit(m.field!)}
-                    >
-                      ↗
-                    </button>
-                  )}
-                </dd>
-              </div>
-            ))}
-          </dl>
-          <p>
-            Confirm measurements in the drawer as you verify them. Lag paths
-            show proposed positions and embedment, not a bolt specification.
-          </p>
-        </div>
-      </div>
+      {state.constructionView === "schedule" ? (
+        <ConstructionScheduleView {...props} />
+      ) : (
+        <ConstructionInspection {...props} viewId={state.constructionView} />
+      )}
     </section>
   );
 }

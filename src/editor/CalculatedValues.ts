@@ -17,7 +17,34 @@ export function calculatedValues(
     bar = getPart(assembly, "soundbar").bounds,
     cradle = getPart(assembly, "cradle").bounds,
     console = getPart(assembly, "console").bounds;
+  const m = assembly.construction.datums;
   switch (group) {
+    case "wall":
+      return [
+        {
+          label: "Blocking bottom above floor",
+          mm: m.blockingBottom,
+          explanation:
+            "Follows the current lag rows unless manual floor height is selected.",
+          controls: [
+            { label: "Board height", field: "distance:blockingHeight" },
+          ],
+        },
+        {
+          label: "Blocking top above floor",
+          mm: m.blockingTop,
+          explanation: "Blocking bottom + chosen board height.",
+        },
+        {
+          label: "Height for selected lag margin",
+          mm: m.requiredBlockingHeight,
+          explanation:
+            "Lag-row separation + twice the chosen planning margin; not a structural specification.",
+          controls: [
+            { label: "Planning margin", field: "distance:blockingLagMargin" },
+          ],
+        },
+      ];
     case "slats":
       return [
         {
@@ -66,6 +93,31 @@ export function calculatedValues(
       ];
     case "tv":
       return [
+        {
+          label: "Hook below TV top · derived",
+          mm: m.tvTopToHook,
+          explanation:
+            "TV top-to-upper-hole fact − reference rail hook-to-hole fact − chosen rail shift.",
+          controls: [{ label: "Rail settings", field: "railPositions" }],
+        },
+        {
+          label: "Hook above TV bottom · derived",
+          mm: m.tvBottomToHook,
+          explanation:
+            "Current hook height − TV bottom. Changes with rail setting.",
+        },
+        {
+          label: "Wall plate top above floor",
+          mm: m.plateTop,
+          explanation:
+            "Hook contact height − assembled hook-to-plate-top offset.",
+          controls: [
+            {
+              label: "Hook / plate offset",
+              field: "distance:hookAbovePlateTop",
+            },
+          ],
+        },
         {
           label: "TV bottom above floor",
           controls: [{ label: "TV center", field: "distance:tvCenterHeight" }],
@@ -147,16 +199,9 @@ export function calculatedValues(
             assembly.construction.plates[0].y +
             assembly.construction.plates[0].height / 2,
           explanation:
-            "Tracks the mount bracket bottom, chosen gap and plate height.",
+            "Tracks the chosen side of the mount, gap and plate height.",
         },
-        ...assembly.findings
-          .filter((f) => /electrical|box-|plate-|route-/.test(f.code))
-          .map((f) => ({
-            label: "Fit check",
-            text: f.message,
-            explanation:
-              "Resolved from the current plates, box envelopes, framing and spacers.",
-          })),
+
       ];
     default:
       return [];

@@ -1,3 +1,7 @@
+import {
+  electricalParts,
+  electricalDimensions,
+} from "../src/electrical/ElectricalTypes";
 import { describe, expect, it } from "vitest";
 import { createInitialProject } from "../src/designer/InitialProject";
 import { createDesignerController } from "../src/designer/DesignerController";
@@ -31,6 +35,12 @@ describe("object-oriented editor and fact verification", () => {
         productAxes.map((axis) => `product:${id}:${axis}`),
       ),
       "studs",
+      "railPositions",
+      ...electricalParts.flatMap((part) =>
+        Object.keys(electricalDimensions).map(
+          (dimension) => `electrical:${part.id}:${dimension}`,
+        ),
+      ),
     ];
     expect(new Set(fields).size).toBe(fields.length);
     expect([...fields].sort()).toEqual(expected.sort());

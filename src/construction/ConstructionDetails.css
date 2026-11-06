@@ -174,3 +174,38 @@
   order: 1;
   margin-left: auto;
 }
+.construction-part-selector {
+  padding: 0 24px 14px;
+  max-width: 400px;
+}
+.build-schedule {
+  padding: 24px;
+}
+.build-schedule p,
+.build-schedule li {
+  font-size: 12px;
+  line-height: 1.7;
+  color: #7b8974;
+}
+.build-schedule h3 {
+  margin-top: 28px;
+}
+.schedule-scroll {
+  overflow-x: auto;
+}
+.build-schedule table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 11px;
+  white-space: nowrap;
+}
+.build-schedule th,
+.build-schedule td {
+  border-bottom: 1px solid #e1e6d8;
+  text-align: left;
+  padding: 10px 12px;
+}
+.build-schedule thead {
+  background: #f1f3ec;
+  color: #627656;
+}

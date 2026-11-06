@@ -193,3 +193,27 @@
   font-size: 9px;
   padding: 4px 7px;
 }
+.mount-height-chain {
+  padding: 6px 0 18px;
+  border-bottom: 1px solid #cdd8c4;
+}
+.mount-height-chain ol {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0;
+}
+.mount-height-chain li {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 11px;
+  padding: 7px 0;
+  border-bottom: 1px solid #e7ecdf;
+}
+.mount-height-chain strong {
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.mount-height-chain button {
+  font-size: 10px;
+}

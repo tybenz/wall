@@ -1,3 +1,8 @@
+import { resolveMountDatums } from "../geometry/MountDatums";
+import type {
+  ElectricalPartId,
+  ElectricalDimensionId,
+} from "../electrical/ElectricalTypes";
 import { applyLayoutAlternative } from "../alternatives/ApplyLayoutAlternative";
 import { resolveAssembly } from "../geometry/ResolveAssembly";
 import { createDesignerStore } from "./DesignerStore";
@@ -30,6 +35,99 @@ export function createDesignerController(
   };
   return {
     store,
+    setUpperElectricalPlacement(upperElectricalPlacement: Project["upperElectricalPlacement"]) {
+      update({ ...store.getSnapshot().project, upperElectricalPlacement });
+    },
+    setBlockingPlacement(blockingPlacement: Project["blockingPlacement"]) {
+      const current = store.getSnapshot().project;
+      const derivedBottom = resolveMountDatums(current).blockingBottom;
+      const bottom = Math.max(
+        distanceDefinitions.blockingBottom.min,
+        Math.min(distanceDefinitions.blockingBottom.max, derivedBottom),
+      );
+      update({
+        ...current,
+        blockingPlacement,
+        distances: {
+          ...current.distances,
+          blockingBottom: { ...current.distances.blockingBottom, mm: bottom },
+        },
+      });
+    },
+    setRailPosition(selectedRailPosition: number) {
+      update({ ...store.getSnapshot().project, selectedRailPosition });
+    },
+    setRailOffsets(positions: readonly number[], confirmed?: boolean) {
+      const current = store.getSnapshot().project,
+        oldShift =
+          current.mountRailOffsets.positions[current.selectedRailPosition];
+      const preserved = positions.indexOf(oldShift);
+      const unchanged =
+        positions.length === current.mountRailOffsets.positions.length &&
+        positions.every((value) =>
+          current.mountRailOffsets.positions.includes(value),
+        );
+      update({
+        ...current,
+        mountRailOffsets: {
+          positions: [...positions],
+          confirmed:
+            confirmed ?? (unchanged && current.mountRailOffsets.confirmed),
+        },
+        selectedRailPosition: preserved >= 0 ? preserved : 0,
+      });
+    },
+    setElectricalMounting(id: ElectricalPartId, plane: "drywall" | "finish") {
+      const current = store.getSnapshot().project;
+      update({
+        ...current,
+        electricalMounting: { ...current.electricalMounting, [id]: plane },
+      });
+    },
+    setElectricalDimension(
+      id: ElectricalPartId,
+      dimension: ElectricalDimensionId,
+      mm: number,
+    ) {
+      if (!Number.isFinite(mm) || mm < 1 || mm > 10000)
+        throw new RangeError(
+          "Enter a physical dimension between 1 and 10,000 mm.",
+        );
+      const current = store.getSnapshot().project,
+        spec = current.electricalParts[id];
+      if (spec[dimension].mm === mm) return;
+      update({
+        ...current,
+        electricalParts: {
+          ...current.electricalParts,
+          [id]: {
+            ...spec,
+            [dimension]: { ...spec[dimension], mm, confidence: "provisional" },
+          },
+        },
+      });
+    },
+    confirmElectricalDimension(
+      id: ElectricalPartId,
+      dimension: ElectricalDimensionId,
+      confirmed: boolean,
+    ) {
+      const current = store.getSnapshot().project,
+        spec = current.electricalParts[id];
+      update({
+        ...current,
+        electricalParts: {
+          ...current.electricalParts,
+          [id]: {
+            ...spec,
+            [dimension]: {
+              ...spec[dimension],
+              confidence: confirmed ? "confirmed" : "provisional",
+            },
+          },
+        },
+      });
+    },
     setMountSwivel(degrees: number) {
       if (!Number.isFinite(degrees) || degrees < 0 || degrees > 70)
         throw new RangeError("Swivel must be between 0 and 70 degrees.");
@@ -43,6 +141,9 @@ export function createDesignerController(
       if (current.distances[id].mm === mm) return;
       update({
         ...current,
+        ...(id === "blockingBottom"
+          ? { blockingPlacement: "manual" as const }
+          : {}),
         distances: {
           ...current.distances,
           [id]: {
@@ -134,10 +235,17 @@ export function createDesignerController(
         },
       });
     },
-    setStuds(positions: readonly number[], confirmed: boolean) {
+    setStuds(positions: readonly number[], confirmed?: boolean) {
+      const current = store.getSnapshot().project;
+      const unchanged =
+        positions.length === current.studs.positions.length &&
+        positions.every((value) => current.studs.positions.includes(value));
       update({
-        ...store.getSnapshot().project,
-        studs: { positions: [...positions].sort((a, b) => a - b), confirmed },
+        ...current,
+        studs: {
+          positions: [...positions].sort((a, b) => a - b),
+          confirmed: confirmed ?? (unchanged && current.studs.confirmed),
+        },
       });
     },
     setSoundbarOrientation(

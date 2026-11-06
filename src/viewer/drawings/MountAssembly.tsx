@@ -14,7 +14,14 @@ export function MountAssembly({
   const b = getPart(assembly, "mount").bounds;
   return (
     <group>
-      <SolidPart bounds={{ ...b, depth: 6 }} color="#333b3b" radius={3} />
+      <SolidPart
+        bounds={{
+          ...b,
+          depth: assembly.construction.lagPaths[0].start[2] - b.z,
+        }}
+        color="#333b3b"
+        radius={3}
+      />
       {preview.links.map(([start, end], index) => (
         <MountLink key={index} start={start} end={end} />
       ))}
@@ -29,20 +36,8 @@ export function MountAssembly({
         </mesh>
       ))}
       <MotionGroup transform={preview.transform}>
-        {[0.25, 0.75].map((fraction) => (
-          <SolidPart
-            key={fraction}
-            bounds={{
-              x: b.x + b.width * fraction - 10,
-              y: b.y - 55,
-              z: b.z + b.depth - 5,
-              width: 20,
-              height: b.height + 110,
-              depth: 5,
-            }}
-            color="#252d2e"
-            radius={2}
-          />
+        {assembly.construction.rails.map((bounds, index) => (
+          <SolidPart key={index} bounds={bounds} color="#252d2e" radius={2} />
         ))}
       </MotionGroup>
     </group>

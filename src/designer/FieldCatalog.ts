@@ -1,4 +1,10 @@
 import {
+  electricalParts,
+  electricalDimensions,
+  type ElectricalPartId,
+  type ElectricalDimensionId,
+} from "../electrical/ElectricalTypes";
+import {
   distanceDefinitions,
   type DistanceId,
   type EditorGroup,
@@ -30,6 +36,8 @@ export function productFieldLabel(
 }
 export function fieldGroup(field: FieldId): EditorGroup {
   if (field === "studs") return "wall";
+  if (field === "railPositions") return "tv";
+  if (field.startsWith("electrical:")) return "electrical";
   if (field.startsWith("distance:"))
     return distanceDefinitions[field.slice(9) as DistanceId].group;
   return productGroups[field.split(":")[1] as ProductId];
@@ -42,6 +50,15 @@ export function fieldIsFact(field: FieldId): boolean {
 }
 export function fieldVerified(project: Project, field: FieldId): boolean {
   if (field === "studs") return project.studs.confirmed;
+  if (field === "railPositions") return project.mountRailOffsets.confirmed;
+  if (field.startsWith("electrical:")) {
+    const [, id, dimension] = field.split(":") as [
+      "electrical",
+      ElectricalPartId,
+      ElectricalDimensionId,
+    ];
+    return project.electricalParts[id][dimension].confidence === "confirmed";
+  }
   if (field.startsWith("distance:"))
     return (
       project.distances[field.slice(9) as DistanceId].confidence === "confirmed"
@@ -63,9 +80,7 @@ export function verificationItems(project: Project): VerificationItem[] {
     const field = `distance:${id}` as const;
     if (def.kind !== "measurement" || fieldVerified(project, field)) continue;
     const bucket: VerificationBucket =
-      def.group === "tv" ||
-      def.group === "electrical" ||
-      id === "cradleThickness"
+      def.group === "tv" || id === "cradleThickness"
         ? "Hardware details"
         : def.section === "Site measurements"
           ? "Site measurements"
@@ -90,6 +105,29 @@ export function verificationItems(project: Project): VerificationItem[] {
           note: project.products[id][axis].evidence.note,
         });
     }
+  for (const part of electricalParts.filter((p) => p.location === "upper"))
+    for (const dimension of Object.keys(
+      electricalDimensions,
+    ) as ElectricalDimensionId[]) {
+      if (dimension !== "plateWidth" && dimension !== "plateHeight") continue;
+      const field = `electrical:${part.id}:${dimension}` as const;
+      if (!fieldVerified(project, field))
+        items.push({
+          field,
+          group: "electrical",
+          label: `${part.label}: ${electricalDimensions[dimension]}`,
+          bucket: "Hardware details",
+          note: project.electricalParts[part.id][dimension].evidence.note,
+        });
+    }
+  if (!project.mountRailOffsets.confirmed)
+    items.push({
+      field: "railPositions",
+      group: "tv",
+      label: "Available rail mounting shifts",
+      bucket: "Hardware details",
+      note: "Verify the available rail shifts relative to the reference mounting setting; positive raises the rails relative to TV.",
+    });
   if (!project.studs.confirmed)
     items.unshift({
       field: "studs",

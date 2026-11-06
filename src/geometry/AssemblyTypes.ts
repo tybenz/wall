@@ -1,3 +1,6 @@
+import type { RouteCrossing } from "./RouteCrossings";
+import type { ElectricalDevice } from "../electrical/ResolveElectrical";
+import type { MountDatums } from "./MountDatums";
 import type { WallProfile } from "./WallProfile";
 export type PartId =
   | "beam"
@@ -43,6 +46,11 @@ export type LagPath = Readonly<{
   end: readonly [number, number, number];
 }>;
 export type Construction = Readonly<{
+  datums: MountDatums;
+  routeCrossings: readonly RouteCrossing[];
+  rails: readonly Bounds[];
+  electrical: readonly ElectricalDevice[];
+  openings: readonly Bounds[];
   studs: readonly Bounds[];
   blocking: readonly Bounds[];
   supports: readonly Spacer[];

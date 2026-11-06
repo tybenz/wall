@@ -1,4 +1,9 @@
 import {
+  electricalParts,
+  electricalDimensions,
+  type ElectricalDimensionId,
+} from "../electrical/ElectricalTypes";
+import {
   distanceDefinitions,
   type DistanceId,
   type EditorGroup,
@@ -13,12 +18,14 @@ const sectionOrder: Record<
     "Site measurements",
     "Blocking plan",
     "Material dimensions",
+    "Calculated",
     "Preview",
   ],
   slats: ["Layout", "Material dimensions", "Calculated"],
   panel: ["Layout", "Material dimensions", "Calculated"],
   tv: [
     "Layout",
+    "Rail positions",
     "Physical dimensions",
     "Attachment plan",
     "Position previews",
@@ -44,6 +51,16 @@ export function editorSections(
         .map(([id]) => `distance:${id as DistanceId}` as const),
       ...(label === "Site measurements" && group === "wall"
         ? ["studs" as const]
+        : []),
+      ...(group === "tv" && label === "Rail positions"
+        ? ["railPositions" as const]
+        : []),
+      ...(group === "electrical" && label === "Physical dimensions"
+        ? electricalParts.flatMap((part) =>
+            (Object.keys(electricalDimensions) as ElectricalDimensionId[]).map(
+              (dimension) => `electrical:${part.id}:${dimension}` as const,
+            ),
+          )
         : []),
       ...Object.entries(productGroups)
         .filter(

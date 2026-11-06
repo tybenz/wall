@@ -1,3 +1,4 @@
+import { lagRowHeights } from "./MountDatums";
 import type { Project } from "../designer/DesignerTypes";
 import type { Bounds, LagPath, Spacer } from "./AssemblyTypes";
 
@@ -42,14 +43,15 @@ export function resolvePanelSupports(
   const inner = centers.map((x) =>
     spacer(x - face / 2, verticalBottom, face, verticalHeight, "mount"),
   );
-  const lagPaths: LagPath[] = centers.flatMap((x) =>
-    [-1, 1].map((side) => {
-      const y = mount.y + mount.height / 2 + (side * d.lagRowSpacing.mm) / 2;
-      return {
-        start: [x, y, mount.z + 6] as const,
-        end: [x, y, -d.drywallThickness.mm - d.lagEmbedment.mm] as const,
-      };
-    }),
+  const lagCenters = [
+    center + d.lagPatternOffsetX.mm - d.lagColumnSpacing.mm / 2,
+    center + d.lagPatternOffsetX.mm + d.lagColumnSpacing.mm / 2,
+  ];
+  const lagPaths: LagPath[] = lagCenters.flatMap((x) =>
+    lagRowHeights(project, mount.y + mount.height).map((y) => ({
+      start: [x, y, mount.z + d.mountPlateThickness.mm] as const,
+      end: [x, y, -d.drywallThickness.mm - d.lagEmbedment.mm] as const,
+    })),
   );
   return { supports: [...perimeter, ...inner], lagPaths };
 }

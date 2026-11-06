@@ -59,17 +59,7 @@ export function SectionDrawing({
             strokeWidth={l.id.startsWith("route") ? 2.5 : 1.8}
             strokeDasharray={l.dashed ? "6 4" : undefined}
           >
-            <title>
-              {l.id.startsWith("lag")
-                ? "Proposed lag path"
-                : l.id === "wall-outline"
-                  ? "Vaulted wall boundary"
-                  : l.id === "cavity-back"
-                    ? "Back of framing cavity"
-                    : l.id === "route-0"
-                      ? "Power route"
-                      : "Low-voltage route"}
-            </title>
+            <title>{l.label ?? l.id}</title>
           </polyline>
         ))}
         <line
@@ -99,7 +89,25 @@ export function SectionDrawing({
             {label}
           </span>
         ))}
-        {section.cutX === null && (
+        {section.lines.some((l) => l.id === "hook-line") && (
+          <>
+            <span>
+              <i style={{ background: "#b77b37" }} />
+              Hook contact line
+            </span>
+            <span>
+              <i style={{ background: "#3c6e70" }} />
+              TV mounting-hole centers
+            </span>
+          </>
+        )}
+        {section.lines.some((l) => l.id.startsWith("crossing-")) && (
+          <span>
+            <i style={{ background: "#bb674f" }} />
+            Unresolved framing passage
+          </span>
+        )}
+        {section.lines.some((l) => l.id.startsWith("route-")) && (
           <>
             <span>
               <i style={{ background: "#b77b37" }} />

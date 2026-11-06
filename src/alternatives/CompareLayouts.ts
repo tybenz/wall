@@ -57,6 +57,21 @@ export function compareLayouts(
     String(current.studs.confirmed),
     String(saved.studs.confirmed),
   );
+  add("Upper electrical placement", current.upperElectricalPlacement, saved.upperElectricalPlacement);
+  add("Blocking placement", current.blockingPlacement, saved.blockingPlacement);
+  add(
+    "Selected rail shift",
+    fmt(current.mountRailOffsets.positions[current.selectedRailPosition]),
+    fmt(saved.mountRailOffsets.positions[saved.selectedRailPosition]),
+  );
+  for (const id of Object.keys(
+    current.electricalMounting,
+  ) as (keyof typeof current.electricalMounting)[])
+    add(
+      `${id} box mounting`,
+      current.electricalMounting[id],
+      saved.electricalMounting[id],
+    );
   add(
     "Soundbar orientation",
     current.soundbarOrientation,

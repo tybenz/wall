@@ -145,7 +145,7 @@ describe("project persistence", () => {
       "panelOffsetX",
       "panelOffsetY",
     ])
-      distances[id] = { ...initial.distances.mountOffsetY, mm: inches(5) };
+      distances[id] = { ...initial.distances.hookAbovePlateTop, mm: inches(5) };
     const project = decodeProject(JSON.stringify({ ...initial, distances }));
     const controller = createDesignerController(project);
     controller.setDistance("wallWidth", inches(120));

@@ -1,3 +1,4 @@
+import type { ElectricalPartId } from "../electrical/ElectricalTypes";
 import { fieldGroup } from "../designer/FieldCatalog";
 import type { ConstructionView } from "../construction/ConstructionSections";
 import type { MountPreset } from "../geometry/MountMotion";
@@ -13,6 +14,7 @@ export type ViewSnapshot = Readonly<{
   zoom: number;
   dimensions: boolean;
   units: "in" | "mm";
+  electricalPart: ElectricalPartId;
   drawerOpen: boolean;
   group: EditorGroup;
   focusField: FieldId | null;
@@ -35,6 +37,7 @@ export function createViewController() {
     zoom: 1,
     dimensions: true,
     units: "in",
+    electricalPart: "upperPower",
     drawerOpen: false,
     group: "tv",
     focusField: null,
@@ -84,11 +87,16 @@ export function createViewController() {
     ) =>
       update({
         drawerOpen: true,
+        ...(focusField?.startsWith("electrical:")
+          ? { electricalPart: focusField.split(":")[1] as ElectricalPartId }
+          : {}),
         group: focusField ? fieldGroup(focusField) : group,
         focusField,
         explanation,
         focusRequest: snapshot.focusRequest + 1,
       }),
+    setElectricalPart: (electricalPart: ElectricalPartId) =>
+      update({ electricalPart, focusField: null, activeField: null }),
     setGroup: (group: EditorGroup) =>
       update({ group, focusField: null, explanation: null }),
     closeEditor: () =>

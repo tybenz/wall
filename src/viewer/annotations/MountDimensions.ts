@@ -56,7 +56,7 @@ export function getPreviewDimensions(
 
       offset: [-90, 0],
       explanation:
-        "Minimum signed distance from the moving TV, soundbar and cradle to the flat panel's front plane. Negative means a part crosses that plane; collision findings also check its vertical and horizontal overlap. Increase extension or reduce swivel in Structure.",
+        "Minimum signed distance from the moving TV, soundbar, cradle and rails to the flat panel's front plane. Negative means a part crosses that plane; collision findings also check its vertical and horizontal overlap. Increase extension or reduce swivel in TV & mount.",
     },
     ...(state.level === 0
       ? ([

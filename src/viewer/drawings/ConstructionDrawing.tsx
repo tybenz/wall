@@ -45,57 +45,52 @@ export function ConstructionDrawing({
       )}
       {state.showElectrical && state.level >= 1 && (
         <>
-          {c.plates.map((b, index) => (
-            <group key={index}>
-              <SolidPart bounds={c.boxes[index]} color="#54727a" radius={4} />
+          {c.electrical.map((device) => (
+            <group key={device.id}>
               <SolidPart
-                bounds={{
-                  x: b.x,
-                  y: b.y,
-                  z: b.z,
-                  width: b.width,
-                  height: b.height,
-                  depth: 3,
-                }}
-                color="#e0dfd6"
+                bounds={device.body}
+                color={device.kind === "power" ? "#8a704f" : "#54727a"}
                 radius={3}
               />
-              {[-1, 1].map((side) => (
-                <group key={side}>
-                  <SolidPart
-                    bounds={{
-                      x:
-                        b.x +
-                        b.width / 2 +
-                        side * b.width * 0.2 -
-                        b.width * 0.08,
-                      y: b.y + b.height * 0.2,
-                      z: b.z + 3,
-                      width: b.width * 0.16,
-                      height: b.height * 0.2,
-                      depth: 2,
-                    }}
-                    color={side < 0 ? "#383f3e" : "#4c6062"}
-                  />
-                  <SolidPart
-                    bounds={{
-                      x:
-                        b.x +
-                        b.width / 2 +
-                        side * b.width * 0.2 -
-                        b.width * 0.08,
-                      y: b.y + b.height * 0.6,
-                      z: b.z + 3,
-                      width: b.width * 0.16,
-                      height: b.height * 0.2,
-                      depth: 2,
-                    }}
-                    color={side < 0 ? "#383f3e" : "#4c6062"}
-                  />
-                </group>
+              {device.reach && (
+                <SolidPart
+                  bounds={device.reach}
+                  color="#aeb9ac"
+                  opacity={0.15}
+                />
+              )}
+              <SolidPart bounds={device.plate} color="#e0dfd6" radius={2} />
+              {[0.25, 0.65].map((f) => (
+                <SolidPart
+                  key={f}
+                  bounds={{
+                    x: device.plate.x + device.plate.width * 0.32,
+                    y: device.plate.y + device.plate.height * f,
+                    z: device.plate.z + device.plate.depth,
+                    width: device.plate.width * 0.36,
+                    height: device.plate.height * 0.16,
+                    depth: 2,
+                  }}
+                  color={device.kind === "power" ? "#383f3e" : "#4c6062"}
+                />
               ))}
             </group>
           ))}
+          {state.level === 4 &&
+            c.routeCrossings.map((hit, index) => (
+              <mesh
+                key={`crossing-${index}`}
+                position={[...hit.center]}
+                renderOrder={10}
+              >
+                <sphereGeometry args={[16, 12, 8]} />
+                <meshBasicMaterial
+                  color="#e33c32"
+                  depthTest={false}
+                  depthWrite={false}
+                />
+              </mesh>
+            ))}
           {state.level === 4 &&
             c.routes.map((route, index) => (
               <Line

@@ -50,3 +50,11 @@ A fitted orthographic camera provides front, right-side and equal-axis isometric
 ## Verification
 
 Model, controller, persistence, projection and view-state tests exercise the public interfaces. Browser checks cover rendering, camera/layer selection, dimension-to-input focus and local save/load. Visual refinements are expected during user testing. Keep future changes localized to these modules rather than adding rules to the workspace root.
+
+## Installation geometry
+
+`MountDatums` resolves TV holes, selected rail shift, hook line, wall plate, lag rows and blocking floor heights without React. Fixed physical inputs remain separate from rail / blocking choices. `ResolvePanelSupports` generates spacers from the chosen layout and lags from independent wall-plate facts. `ResolveConstruction` fills complete stud bays for blocking.
+
+`electrical` owns generic, independent per-location component facts and pure body/plate/opening placement. A box's front datum is a layout choice; physical body depth remains invariant. `SegmentIntersections` and `RouteCrossings` resolve actual in-wall segment intersections, shared by findings, section markers and the coordinate schedule. Reserved connection reach is not fabricated hardware.
+
+`ConstructionSections` resolves preset drawing primitives. `ConstructionSchedule` resolves millimeter cut / location data; SVG and CSV renderers consume it. `ConstructionDetails` only switches the fixed drawing/schedule views and triggers downloads. `UpgradeConstruction` preserves older project datums while explicitly marking inferred separate component facts provisional. `OffsetListEditor` is shared by stud offsets and available rail mounting shifts.

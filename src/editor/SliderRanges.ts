@@ -14,15 +14,23 @@ type InchRange = readonly [number, number];
 // Interaction ranges are deliberately narrower than the project's valid limits.
 // Precise text entry can expand a slider without changing the entered value.
 const distances: Record<DistanceId, InchRange> = {
+  tvTopToMountHole: [0, 40],
+  railReferenceHoleBelowHook: [-20, 20],
+  railAboveHook: [0, 20],
+  railBelowHook: [0, 40],
+  tvMountHoleSpacingX: [1, 40],
+  tvMountHoleSpacingY: [1, 40],
+  hookAbovePlateTop: [-20, 20],
+  lagTopRowInset: [0, 20],
+  lagBottomRowInset: [0, 20],
+  lagColumnSpacing: [1, 40],
+  lagPatternOffsetX: [-12, 12],
+  mountPlateThickness: [0.125, 1],
+  blockingLagMargin: [0, 6],
+  electricalPlateGap: [0, 12],
   studWidth: [0.5, 4],
   blockingDepth: [0.5, 6],
   lagEmbedment: [0.25, 4],
-  lagRowSpacing: [1, 16],
-  plateWidth: [2, 12],
-  plateHeight: [2, 12],
-  boxWidth: [1, 12],
-  boxHeight: [1, 12],
-  boxDepth: [0.5, 6],
   routeDepth: [0.25, 6],
   powerRouteOffsetX: [-36, 36],
   signalRouteOffsetX: [-36, 36],
@@ -53,7 +61,6 @@ const distances: Record<DistanceId, InchRange> = {
   supportInset: [0, 12],
   mountWidth: [4, 40],
   mountHeight: [2, 24],
-  mountOffsetY: [-24, 24],
   blockingBottom: [12, 96],
   blockingHeight: [1, 24],
   blockingWidth: [12, 96],
@@ -69,7 +76,7 @@ const products: Record<ProductId, Record<ProductAxis, InchRange>> = {
   featurePanel: { width: [24, 96], height: [48, 144], depth: [0.25, 3.5] },
 };
 export function getSliderRange(
-  field: Exclude<FieldId, "studs">,
+  field: Exclude<FieldId, "studs" | "railPositions">,
   mm: number,
 ): SliderRange {
   let range: InchRange;
@@ -78,6 +85,9 @@ export function getSliderRange(
     const id = field.slice(9) as DistanceId;
     range = distances[id];
     limits = distanceDefinitions[id];
+  } else if (field.startsWith("electrical:")) {
+    range = [0.25, 12];
+    limits = { min: 1, max: 1000 };
   } else {
     const [, product, axis] = field.split(":") as [
       "product",

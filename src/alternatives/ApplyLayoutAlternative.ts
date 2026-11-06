@@ -10,6 +10,16 @@ export function applyLayoutAlternative(
 ): Project {
   return {
     ...current,
+    upperElectricalPlacement: saved.upperElectricalPlacement,
+    blockingPlacement: saved.blockingPlacement,
+    electricalMounting: saved.electricalMounting,
+    selectedRailPosition: current.mountRailOffsets.positions.includes(
+      saved.mountRailOffsets.positions[saved.selectedRailPosition],
+    )
+      ? current.mountRailOffsets.positions.indexOf(
+          saved.mountRailOffsets.positions[saved.selectedRailPosition],
+        )
+      : current.selectedRailPosition,
     distances: Object.fromEntries(
       (Object.keys(distanceDefinitions) as DistanceId[]).map((id) => [
         id,

@@ -21,7 +21,7 @@ export function DistanceInput({
   mode?: "layout" | "fact";
   editRequest?: number;
   source?: string;
-  field: Exclude<FieldId, "studs">;
+  field: Exclude<FieldId, "studs" | "railPositions">;
   label: string;
   mm: number;
   note: string;

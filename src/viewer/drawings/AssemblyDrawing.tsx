@@ -34,6 +34,7 @@ export function AssemblyDrawing({
       {state.level < 4 && (
         <PanelSlab
           bounds={getPart(assembly, "drywall").bounds}
+          openings={getPart(assembly, "drywall").openings}
           topProfile={assembly.wallProfile}
           color="#e5e1d6"
         />

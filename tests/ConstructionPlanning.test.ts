@@ -14,31 +14,34 @@ import { inches } from "../src/shared/Units";
 describe("construction planning", () => {
   it("keeps plates at finished faces and sizes rough openings independently", () => {
     const controller = createDesignerController(createInitialProject());
-    controller.setDistance("boxWidth", 90);
-    controller.setDistance("plateWidth", 170);
-    controller.setDistance("boxDepth", 60);
-    const { project, assembly } = controller.store.getSnapshot();
+    controller.setElectricalDimension("upperPower", "openingWidth", 90);
+    controller.setElectricalDimension("upperPower", "plateWidth", 170);
+    controller.setElectricalDimension("upperPower", "bodyDepth", 60);
+    const { assembly } = controller.store.getSnapshot();
     const c = assembly.construction;
     expect(c.plates[0].width).toBe(170);
-    expect(c.boxes[0].width).toBe(90);
+    expect(c.electrical[0].opening.width).toBe(90);
     expect(c.plates[0].x + c.plates[0].width / 2).toBeCloseTo(
       c.boxes[0].x + c.boxes[0].width / 2,
     );
     expect(c.plates[0].z).toBe(assembly.depth.panelFront);
-    expect(c.boxes[0].z).toBe(-project.distances.drywallThickness.mm - 60);
-    expect(c.boxes[0].z + c.boxes[0].depth).toBeCloseTo(c.plates[0].z);
+    expect(c.boxes[0].z).toBe(-60);
+    expect(c.boxes[0].z + c.boxes[0].depth).toBe(0);
+    expect(c.electrical[0].reach?.depth).toBe(c.plates[0].z);
     expect(
       assembly.parts.find((p) => p.id === "featurePanel")?.openings,
-    ).toEqual([c.boxes[0]]);
+    ).toEqual(
+      c.electrical.filter((p) => p.location === "upper").map((p) => p.opening),
+    );
   });
   it("uses actual proposed lag rows and embedment and reports missing material", () => {
     const controller = createDesignerController(createInitialProject());
     controller.setDistance("blockingDepth", inches(1));
     controller.setDistance("lagEmbedment", inches(2));
-    controller.setDistance("lagRowSpacing", inches(12));
+    controller.setDistance("lagBottomRowInset", inches(14.25));
     const { assembly, project } = controller.store.getSnapshot();
     const paths = assembly.construction.lagPaths;
-    expect(paths[1].start[1] - paths[0].start[1]).toBeCloseTo(inches(12));
+    expect(paths[0].start[1] - paths[1].start[1]).toBeCloseTo(inches(12));
     expect(paths[0].end[2]).toBeCloseTo(
       -project.distances.drywallThickness.mm - inches(2),
     );
@@ -58,12 +61,16 @@ describe("construction planning", () => {
       .assembly.findings.map((f) => f.code);
     expect(codes).toContain("route-framing-0");
     expect(codes).not.toContain("route-framing-1");
-    controller.setDistance("boxDepth", inches(5));
+    controller.setElectricalDimension("upperPower", "bodyDepth", inches(5));
     controller.setDistance("routeDepth", inches(6));
-    controller.setDistance("boxWidth", inches(12));
+    controller.setElectricalDimension("upperPower", "openingWidth", inches(12));
     codes = controller.store.getSnapshot().assembly.findings.map((f) => f.code);
     expect(codes).toEqual(
-      expect.arrayContaining(["box-depth", "route-depth", "plate-coverage"]),
+      expect.arrayContaining([
+        "box-depth-upperPower",
+        "route-depth",
+        "plate-coverage-upperPower",
+      ]),
     );
   });
   it("does not flag a segment next to framing as crossing it", () => {
@@ -132,9 +139,9 @@ describe("construction planning", () => {
       );
     expect(svg).toContain("Unresolved measurements");
     expect(svg).toContain("Stud centers unconfirmed");
-    expect(svg).toContain("45″");
+    expect(svg).toContain("52″");
     expect(svg).not.toMatch(/(?:NaN|Infinity|undefined)/);
-    expect(exportConstructionSvg(p, "mm")).toContain("1143 mm");
+    expect(exportConstructionSvg(p, "mm")).toContain("1320.8 mm");
   });
 });
 
